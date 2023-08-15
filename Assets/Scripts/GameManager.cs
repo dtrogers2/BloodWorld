@@ -8,7 +8,7 @@ public class GameManager : MonoBehaviour
     public Texture2D spriteSheet;
     private EventManager eventManager;
     private bool keyReleased = true;
-    void Start()
+    void Awake ()
     {
         Sprite[] sprites = Resources.LoadAll<Sprite>(spriteSheet.name);
         //Term term = new GTerm(Term.StockDim(), sprites);

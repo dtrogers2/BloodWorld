@@ -6,7 +6,6 @@ using UnityEngine.UIElements;
 public interface IGame
 {
     public Rng rng { get; set; }
-    public IRegion curMap();
     public Creature player { get; set; }
     public IAI ai { get; set; }
     public void msg(string s);
@@ -39,8 +38,6 @@ public class Game : IGame
         this.build = build;
 
     }
-
-    public IRegion curMap() { return this.world.curMap(this); }
 
     public void msg(string s)
     {

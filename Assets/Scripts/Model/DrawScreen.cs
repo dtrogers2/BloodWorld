@@ -7,8 +7,8 @@ public class DrawScreen
 {
     public static void drawMap(ITerm term, Vector2Int startPos, IRegion map = null)
     {
-        Vector2Int t = new Vector2Int();
-        Vector2Int w = new Vector2Int();
+        Vector3Int t = new Vector3Int();
+        Vector3Int w = new Vector3Int();
         Vector2Int tdim = new Vector2Int(33, 21);
         for (t.y = 0, w.y = startPos.y; t.y < tdim.y; w.y++, t.y++)
         {
@@ -19,7 +19,7 @@ public class DrawScreen
                 TermChar termChar = outside;
                 if (map != null)
                 {
-                    termChar = (map.legal(w.x, w.y)) ? map.tile(w.x, w.y).glyph() : outside;
+                    termChar = (map.legal(w)) ? map.tile(w).glyph() : outside;
                 }
                 term.at(t.x, t.y, termChar.c, termChar.foreground, termChar.background, termChar.special);
             }
@@ -53,8 +53,9 @@ public class DrawScreen
     {
         Creature player = game.player;
         string name = extend(player.name, term);
-        string race = extend($"({player.position.x}, {player.position.y}, {player.position.z})", term);
-        string health = extend("Health: ", term);
+        Vector3Int regionPos = game.world.regionPosition(player.position);
+        string race = extend($"({player.position.x}, {player.position.y}, {player.position.z}) ({regionPos.x}, {regionPos.y}, {regionPos.z})", term);
+        string health = extend($"Health: {game.player.hp}/{game.player.maxhp}", term);
         string magic = extend("Magic: ", term);
         string ac = extend("AC: ", term); string str = extend("Str: ", term);
         string ev = extend("EV: ", term); string intelligence = extend("Int: ", term);
@@ -98,14 +99,12 @@ public class DrawScreen
     {
         MsgLog log = game.log;
         if (log == null) return;
-        int startY = term.dim.y - 5;
-        int maxLines = term.dim.y - startY;
-        for (int i = 0; i < maxLines; i++)
+        for (int i = 0, y = 21; y < term.dim.y; y++, i++)
         {
             if (log.archive.Count > i)
             {
                 string s = extend(log.archive[i], term);
-                term.txt(0, 22, s, ColorHex.White_Dark, ColorHex.Black, "");
+                term.txt(0, y, s, ColorHex.White_Dark, ColorHex.Black, "");
             }
         }
     }

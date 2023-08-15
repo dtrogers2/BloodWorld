@@ -5,7 +5,6 @@ using UnityEngine;
 public class ParseCommand
 {
     public Creature player;
-    public IRegion map;
     public IGame game;
     public IScreenMaker maker;
     public ParseCommand(IGame game, IScreenMaker maker)
@@ -13,7 +12,6 @@ public class ParseCommand
         this.game = game;
         this.maker = maker;
         this.player = game.player;
-        this.map = game.curMap();
     }
 
     public bool parseKeycodeTurn(KeyCode c, IStack ss, out float actionCost)
@@ -37,6 +35,8 @@ public class ParseCommand
             case KeyCode.End: dir.x -= 1; dir.y += 1; break;
             case KeyCode.PageUp: dir.x += 1; dir.y -= 1; break;
             case KeyCode.PageDown: dir.x += 1; dir.y += 1; break;
+            case KeyCode.Delete: case KeyCode.Period: case KeyCode.Clear: return this.waitCmd();
+            case KeyCode.Q: s = new LogScreen(game, maker); break;
             default: return null;
         }
 
@@ -47,7 +47,7 @@ public class ParseCommand
 
         if (dir != Vector3Int.zero)
         {
-            return moveCmd(dir);
+            return bumpCmd(dir);
         }
         return null;
     }
@@ -55,5 +55,15 @@ public class ParseCommand
     public ICmd moveCmd(Vector3Int dir)
     {
         return new MoveCmd(dir, player, game);
+    }
+
+    public ICmd bumpCmd(Vector3Int dir)
+    {
+        return new BumpCmd(dir, player, game);
+    }
+
+    public ICmd waitCmd()
+    {
+        return new WaitCmd(player, game);
     }
 }

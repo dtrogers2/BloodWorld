@@ -8,6 +8,8 @@ public class Build : IBuild
     {
         Rng rng = new Rng(42);
         Creature player = makePlayer();
+        player.maxhp = 10000;
+        player.hp = 10000;
         Game game = new Game(rng, player, this);
         enterFirstLevel0(game);
         game.ai = makeAI();
@@ -17,54 +19,46 @@ public class Build : IBuild
     {
         return new AIBase();
     }
-    public IRegion makeLevel(Rng rng, Vector3Int regionPos)
+    public IRegion makeLevel(IGame game, Vector3Int regionPos, bool addMobs = false)
     {
-        IRegion map = makeMap(rng, regionPos);
-        addLevelStairs(map, map.level, rng);
-        addMobsToLevel(map, rng);
+        IRegion map = makeMap(game.rng, regionPos);
+        addMobsToRegion(map);
         return map;
     }
 
-    public void addLevelStairs(IRegion map, int level, Rng rng)
+    public void addLevelStairs(IRegion map, Rng rng)
     {
         // Do nothing for now...
     }
 
-    public void addMobsToLevel(IRegion map, Rng rng)
+    public void addMobsToRegion(IRegion map)
     {
-        makeMobs(map, rng, 50);
+        makeMobs(map, 50);
 
     }
 
-    public void makeMobs(IRegion region, Rng rng, int rate)
+    public void makeMobs(IRegion map, int rate)
     {
 
-        Vector3Int pos = new Vector3Int(40, 20, 0);
-        addNPC(pos, region, 0);
-        /*
-        for (pos.y = 1; pos.y < region.dim.y - 1; pos.y++)
-        {
-            for (pos.x = 1; pos.x < region.dim.x - 1; pos.x++)
-            {
-                if (!rng.oneIn(rate)) continue;
-                if (region.blocked(pos.x, pos.y)) continue;
-                addNPC(pos, region, 0);
-            }
-        }*/
-    }
-
-    public void addNPC(Vector3Int pos, IRegion region, int level)
-    {
-        Vector3Int worldPos = new Vector3Int(pos.x + region.dim.x * region.regionPos.x, pos.y + region.dim.y * region.regionPos.y, region.regionPos.z);
+        Vector3Int pos = new Vector3Int(40 + (map.dim.x * map.regionPos.x), 20 + (map.dim.y * map.regionPos.y), 0);
         Creature creature = new Creature(pos, "Ant", new TermChar { c = 'a', background = ColorHex.Black, foreground = ColorHex.Red_Bright, special = "" });
-        region.addEntity(creature);
-        creature.position = worldPos;
+        Vector3Int pos2 = new Vector3Int(40 + (map.dim.x * map.regionPos.x), 10 + (map.dim.y * map.regionPos.y), 0);
+        Creature creature2 = new Creature(pos2, "Bat", new TermChar { c = 'b', background = ColorHex.Black, foreground = ColorHex.Black_Bright, special = "" });
+        creature2.baseMoveCost = 0.5f;
+
+        //Region must be initialized or trying to add leads to infinite loop
+        addNPC(creature2, map);
+        addNPC(creature, map);
+    }
+
+    public void addNPC(Creature c, IRegion map)
+    {
+        map.addEntity(c);
     }
 
     public IRegion makeMap(Rng rng, Vector3Int regionPos)
     {
         Vector2Int dim = Term.StockDim();
-        // Generate region
         IRegion map = TestMap.test(dim, regionPos, rng);
         return map;
     }
@@ -82,8 +76,16 @@ public class Build : IBuild
     public void enterFirstLevel0(IGame game)
     {
         World world = game.world;
-        IRegion map = world.curMap(game);
-        Vector3Int np = world.localizePosition((Vector3Int) centorPos(map.dim));
-        world.creatureSwitchRegion(game.player, np, game);
+        world.addEntity(game.player, game);
+        Vector3Int pos = new Vector3Int(40, 20, 0);
+        Creature creature = new Creature(pos, "Ant", new TermChar { c = 'a', background = ColorHex.Black, foreground = ColorHex.Red_Bright, special = "" });
+        Vector3Int pos2 = new Vector3Int(40, 10, 0);
+        Creature creature2 = new Creature(pos2, "Bat", new TermChar { c = 'b', background = ColorHex.Black, foreground = ColorHex.Black_Bright, special = "" });
+        creature2.baseMoveCost = 0.5f;
+
+        world.addEntity(creature, game);
+        world.addEntity(creature, game);
     }
+
+
 }

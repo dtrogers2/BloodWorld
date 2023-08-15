@@ -14,7 +14,7 @@ public class BaseScreen : IScreen
         this.maker = maker;
     }
 
-    public void draw(ITerm term)
+    virtual public void draw(ITerm term)
     {
         DrawScreen.drawMapPlayer(term, game.player.position, game);
         DrawScreen.renderHUD(term, game);
@@ -24,25 +24,47 @@ public class BaseScreen : IScreen
     public void npcTurns(IStack stack, float actionCost)
     {
         Creature player = game.player;
-        IRegion map = game.curMap();
-        TurnQueue q = map.queue;
-        for(Creature m = q.next(); m != player && !this.over(stack); m = q.next())
+        Stack<Creature> activeCreatures = new Stack<Creature>();
+        Stack<IRegion> regions = game.world.getRegions(player.position, 1, game);
+        while (regions.Count > 0)
         {
-            npcTurn(m, player);
+            IRegion r = regions.Pop();
+            for (int i = 0; i < r.creatureList.Count; i++)
+            {
+                if (!activeCreatures.Contains(r.creatureList[i]) && r.creatureList[i] != game.player) activeCreatures.Push(r.creatureList[i]);
+            }
+        }
+        for (int i = activeCreatures.Count; i > 0; i--)
+        {
+            npcTurn(activeCreatures.Pop(), game.player);
         }
         handleMsgs(stack);
+        finishPlayerTurn();
     }
     public void npcTurn(Creature me, Creature tgt)
     {
         
         me.actionCost -= tgt.actionCost;
         IAI ai = game.ai;
-        if (ai != null) 
+        if (ai != null && me.actionCost <= 0) 
         {
-            float newCost = 0.0f;
-            ai.turn(me, tgt, game, out newCost);
-            me.actionCost += newCost;
+            while (me.actionCost <= 0)
+            {
+                float newCost = 0.0f;
+                ai.turn(me, tgt, game, out newCost);
+                me.actionCost += newCost;
+            }
         }
+    }
+
+    public void finishTurn(Creature c)
+    {
+
+    }
+
+    public void finishPlayerTurn()
+    {
+        game.player.actionCost = 0f;
     }
     public void handleMsgs(IStack s)
     {

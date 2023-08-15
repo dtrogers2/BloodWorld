@@ -9,7 +9,7 @@ public class Tile : IComparer
     public TermChar floor;
     public Creature creature;
     public bool lit;
-    public Vector2Int position;
+    public Vector3Int position;
 
     public int gScore { set; get; }
     public int hScore { set; get; }
@@ -19,15 +19,20 @@ public class Tile : IComparer
     public Tile(TermChar floor, int x, int y)
     {
         this.floor = floor;
-        this.position = new Vector2Int(x, y);
+        this.position = new Vector3Int(x, y);
         resetNode();
     }
 
     public bool blocks()
     {
-        
+        if (creature != null) return true;
         if (wall != null) return wall.blocks;
-        return creature != null;
+        return false;
+    }
+
+    public bool traversable()
+    {
+        return (wall != null) ? !wall.blocks : true;
     }
     public bool opaque()
     {

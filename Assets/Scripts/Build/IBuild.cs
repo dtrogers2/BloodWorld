@@ -6,8 +6,7 @@ using UnityEngine;
 public interface IBuild
 {
     public IGame makeGame();
-    public IRegion makeLevel(Rng rng, Vector3Int worldPos);
-    public IRegion makeMap(Rng rng, Vector3Int worldPos);
+    public IRegion makeLevel(IGame game, Vector3Int regionPos, bool addMobs = false);
 }
 
 public interface IBuild1 : IBuild
