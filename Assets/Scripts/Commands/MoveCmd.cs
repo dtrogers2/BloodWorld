@@ -12,9 +12,8 @@ public class MoveCmd : CmdBase
 
     public override bool exc()
     {
-        Position p = (Position) game.build.POSITIONS.data[me];
+        Position p = (Position) ComponentManager.get(COMPONENT.POSITION).data[me];
         Vector3Int newPos = new Vector3Int(p.x + dir.x, p.y + dir.y, p.z + dir.z);
-        //bool legal = game.world.moveEntity(me, newPos, game);
         bool legal = game.world.moveEntity(me, newPos, game);
         return legal;
     }

@@ -45,117 +45,58 @@ public static class EntityManager
 
 public struct ENTITY
 {
-    public static void subscribe(uint id, object data, ComponentInf component)
+    public static void subscribe(uint id, object data, COMPONENT component)
     {
-        // TODO try simpler version
-        //component.data[data);
         uint eBits = EntityManager.entities[id];
-        string cName = component.GetType().Name.ToUpper().Replace("COMPONENT", "");
-        if (Enum.TryParse(cName, out COMPONENT c))
-        {
-            uint newSet = bitSet(eBits, (uint)c);
-            EntityManager.entities[id] = newSet;
-            component.data[id] =  data;
-            component.entities.Add(id);
-        }
-        else
-        {
-            throw new Exception($"Entity {id} has a component that could not be parsed!!");
-        }
+        uint newSet = bitSet(eBits, (uint) component);
+        EntityManager.entities[id] = newSet;
+        int index = Array.IndexOf(Enum.GetValues(component.GetType()), component);
+        ComponentManager.COMPONENTS[index].data[id] = data;
+        ComponentManager.COMPONENTS[index].entities.Add(id);
     }
-    public static void subscribe(uint id, object[] data, params ComponentInf[] components)
+    public static void subscribe(uint id, object[] data, params COMPONENT[] components)
     {
-        int paramIx = 0;
-        foreach (ComponentInf component in components)
+        if (data.Length != components.Length) { throw new Exception($"subscribe() data length differs from components length!!"); }
+        for (int i = 0; i < components.Length; i++)
         {
-            // TODO try simpler version
-            //component.data[data);
-            uint eBits = EntityManager.entities[id];
-            string cName = component.GetType().Name.ToUpper().Replace("COMPONENT", "");
-            if (Enum.TryParse(cName, out COMPONENT c))
-            {
-                uint newSet = bitSet(eBits, (uint)c);
-                EntityManager.entities[id] = newSet;
-
-                component.data[id] =  data[paramIx];
-                component.entities.Add(id);
-            }
-            else
-            {
-                throw new Exception($"Entity {id} has a component that could not be parsed!!");
-            }
-            paramIx++;
+            subscribe(id, data[i], components[i]);
         }
     }
 
-    public static void unsubscribe(uint id, params ComponentInf[] components)
+    public static void unsubscribe(uint id, COMPONENT component)
     {
-        foreach (ComponentInf component in components)
-        {
-            string cName = component.GetType().Name.ToUpper().Replace("COMPONENT", "");
-            if (Enum.TryParse(cName, out COMPONENT c))
-            {
-                EntityManager.entities[id] = bitDel(EntityManager.entities[id], (uint)c);
+        EntityManager.entities[id] = bitDel(EntityManager.entities[id], (uint) component);
+        int index = Array.IndexOf(Enum.GetValues(component.GetType()), component);
+        ComponentManager.COMPONENTS[index].data[id] = null;
+        ComponentManager.COMPONENTS[index].entities.Remove(id);
+        if (EntityManager.entities[id] == (uint)COMPONENT.NONE) EntityManager.clear(id);
 
-                component.data[id] = null;
-                component.entities.Remove(id);
-            }
-            else
-            {
-                throw new Exception($"Entity {id} has a component that could not be parsed!!");
-            }
+    }
+    public static void unsubscribe(uint id, params COMPONENT[] components)
+    {
+        for (int i = 0; i < components.Length; i++)
+        {
+            unsubscribe(id, components[i]);
         }
         if (EntityManager.entities[id] == (uint) COMPONENT.NONE) EntityManager.clear(id);
     }
 
-    public static void unsubscribe(uint id, ComponentInf component)
-    {
-        string cName = component.GetType().Name.ToUpper().Replace("COMPONENT", "");
-        if (Enum.TryParse(cName, out COMPONENT c))
-        {
-            EntityManager.entities[id] = bitDel(EntityManager.entities[id], (uint)c);
-            component.data[id] = null;
-            component.entities.Remove(id);
-        }
-        else
-        {
-            throw new Exception($"Entity {id} has a component that could not be parsed!!");
-        }
-        if (EntityManager.entities[id] == (uint) COMPONENT.NONE) EntityManager.clear(id);
 
-    }
 
-    public static bool has(uint id, params ComponentInf[] components)
+    public static bool has(uint id, params COMPONENT[] components)
     {
 
         uint bitset = EntityManager.entities[id];
-        foreach (ComponentInf component in components)
+        foreach (COMPONENT component in components)
         {
-            // Test simpler version
-            // return !component.data.Contains(id);
-            string cName = component.GetType().Name.ToUpper().Replace("COMPONENT", "");
-            if (Enum.TryParse(cName, out COMPONENT c)) {
-                if (!bitHas(bitset, (uint) c)) return false;
-            } else
-            {
-                throw new Exception($"Entity {id} has a component that could not be parsed!!");
-            }
+            if (!bitHas(bitset, (uint)component)) return false;
         }
         return true;
     }
 
-    public static bool has(uint id, ComponentInf component)
+    public static bool has(uint id, COMPONENT component)
     {
-        // return !component.data.Contains(id);
-        string cName = component.GetType().Name.ToUpper().Replace("COMPONENT", "");
-        if (Enum.TryParse(cName, out COMPONENT c))
-        {
-            return bitHas(EntityManager.entities[id], (uint)c);
-        }
-        else
-        {
-            throw new Exception($"Entity {id} has a component that could not be parsed!!");
-        }
+        return bitHas(EntityManager.entities[id], (uint)component);
     }
 
     public static bool bitHas(uint src, uint set)

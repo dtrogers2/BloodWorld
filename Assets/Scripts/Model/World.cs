@@ -165,7 +165,7 @@ public class World
             {
                 if (removeEntity(c, game))
                 {
-                    game.build.POSITIONS.data[c] = new Position { x = dest.x, y = dest.y, z = dest.z };
+                    ComponentManager.get(COMPONENT.POSITION).data[c] = new Position { x = dest.x, y = dest.y, z = dest.z };
                     if (addEntity(c, game))
                     {
                         return true;
@@ -203,9 +203,9 @@ public class World
 
     public bool removeEntity(uint c, IGame game)
     {
-        if (ENTITY.has(c, game.build.POSITIONS))
+        if (ENTITY.has(c, COMPONENT.POSITION))
         {
-            Position p = (Position) game.build.POSITIONS.data[c];
+            Position p = (Position)ComponentManager.get(COMPONENT.POSITION).data[c];
             if (getRegion(new Vector3Int(p.x, p.y, p.z), game, out IRegion r))
             {
                 r.removeEntity(c);
@@ -218,10 +218,10 @@ public class World
 
     public bool addEntity(uint c, IGame game)
     {
-        if (ENTITY.has(c, game.build.POSITIONS))
+        if (ENTITY.has(c, COMPONENT.POSITION))
         {
            
-            Position p = (Position) game.build.POSITIONS.data[c];
+            Position p = (Position) ComponentManager.get(COMPONENT.POSITION).data[c];
             if (getRegion(new Vector3Int(p.x, p.y, p.z), game, out IRegion r))
                 {
                     r.addEntity(c);

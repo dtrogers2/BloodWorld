@@ -6,8 +6,6 @@ public class Build : IBuild
 {
     public Wall defaultWall { get; set; }
 
-    public PositionComponent POSITIONS { get; set; } = new PositionComponent();
-    public GlyphComponent GLYPHS { get; set; } = new GlyphComponent();
     public uint wallId { get; set; }
     public uint floorId { get; set; }
 
@@ -31,8 +29,7 @@ public class Build : IBuild
 
     public void initComponents()
     {
-        //positions = new PositionComponent();
-        //glyphs = new GlyphComponent();
+        ComponentManager.init();
     }
 
     public void makeEnv()
@@ -41,11 +38,11 @@ public class Build : IBuild
         Glyph floorGlyph = new Glyph { c = '.', color = ColorHex.White };
         Glyph emptyGlyph = new Glyph { c = ' ', color = ColorHex.Black };
         emptyId = EntityManager.create();
-        ENTITY.subscribe(emptyId, emptyGlyph, GLYPHS);
+        ENTITY.subscribe(emptyId, emptyGlyph, COMPONENT.GLYPH);
         wallId = EntityManager.create();
-        ENTITY.subscribe(wallId, wallGlyph, GLYPHS);
+        ENTITY.subscribe(wallId, wallGlyph, COMPONENT.GLYPH);
         floorId = EntityManager.create();
-        ENTITY.subscribe(floorId, floorGlyph, GLYPHS);
+        ENTITY.subscribe(floorId, floorGlyph, COMPONENT.GLYPH);
     }
     public IAI makeAI()
     {
@@ -124,7 +121,7 @@ public class Build : IBuild
         Glyph g = new Glyph { c = '@', color = ColorHex.White };
         Position p = new Position { x = 0, y = 0, z = 0 };
         uint player = EntityManager.create();
-        ENTITY.subscribe(player, new object[2] { g, p}, new ComponentInf[2] { GLYPHS, POSITIONS });
+        ENTITY.subscribe(player, new object[2] { g, p}, new COMPONENT[2] { COMPONENT.GLYPH, COMPONENT.POSITION });
         return player;
     }
 

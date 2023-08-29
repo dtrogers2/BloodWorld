@@ -30,7 +30,7 @@ public class BumpCmd : CmdBase
     public override bool turn(out float actionCost)
     {
         actionCost = 1.0f;
-        Position p = (Position)game.build.POSITIONS.data[me];
+        Position p = (Position) ComponentManager.get(COMPONENT.POSITION).data[me];
         Vector3Int tgtPos = new Vector3Int(p.x + dir.x, p.y + dir.y, p.z + dir.z);
         /*
         if (game.world.getTile(tgtPos, game, out Tile tile))
@@ -48,9 +48,9 @@ public class BumpCmd : CmdBase
                 for (int i = 0; i < r.entities.Count; i++)
                 {
                     uint eId = r.entities.ElementAt(i);
-                    if (ENTITY.has(eId,game.build.POSITIONS ))
+                    if (ENTITY.has(eId, COMPONENT.POSITION))
                     {
-                        Position otherP = (Position) game.build.POSITIONS.data[eId];
+                        Position otherP = (Position) ComponentManager.get(COMPONENT.POSITION).data[eId];
 
                         if (otherP.x == tgtPos.x && otherP.y == tgtPos.y)
                         {

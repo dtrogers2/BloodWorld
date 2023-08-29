@@ -6,9 +6,6 @@ using UnityEngine;
 public interface IBuild
 {
     public Wall defaultWall { get; }
-    public PositionComponent POSITIONS { get; set; }
-    public GlyphComponent GLYPHS { get; set; }
-
     public uint wallId { get; set; }
     public uint floorId { get; set; }
     public IGame makeGame();

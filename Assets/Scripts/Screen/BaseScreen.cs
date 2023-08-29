@@ -17,7 +17,7 @@ public class BaseScreen : IScreen
 
     virtual public void draw(ITerm term)
     {
-        Position p = (Position) game.build.POSITIONS.data[game.playerId];
+        Position p = (Position) ComponentManager.get(COMPONENT.POSITION).data[game.playerId];
         Vector3Int pos = new Vector3Int(p.x, p.y, p.z);
         DrawScreen.drawMapPlayer(term, pos, game);
         DrawScreen.renderHUD(term, game);
@@ -26,7 +26,7 @@ public class BaseScreen : IScreen
 
     public void npcTurns(IStack stack, float actionCost)
     {
-        Position p = (Position)game.build.POSITIONS.data[game.playerId];
+        Position p = (Position) ComponentManager.get(COMPONENT.POSITION).data[game.playerId];
         Vector3Int pos = new Vector3Int(p.x, p.y, p.z);
         Stack<uint> activeCreatures = new Stack<uint>();
         Stack<IRegion> regions = game.world.getRegions(pos, 1, game);

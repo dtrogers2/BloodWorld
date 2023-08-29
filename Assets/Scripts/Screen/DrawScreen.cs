@@ -56,9 +56,9 @@ public class DrawScreen
                 if (game.world.getCellEntity(w, game, out uint cell))
                 {
                     //Debug.Log($"{w} : {cell}");
-                    if (ENTITY.has(cell, game.build.GLYPHS))
+                    if (ENTITY.has(cell, COMPONENT.GLYPH))
                     {
-                       Glyph g = (Glyph) game.build.GLYPHS.data[cell];
+                       Glyph g = (Glyph)ComponentManager.get(COMPONENT.GLYPH).data[cell];
                        term.at(t.x, t.y, g.c, g.color, termChar.background);
                     }
                 } else
@@ -75,19 +75,18 @@ public class DrawScreen
             for (int i = 0; i < r.entities.Count; i++)
             {
                 uint eId = r.entities.ElementAt(i);
-                if (ENTITY.has(eId, new ComponentInf[2] { game.build.POSITIONS, game.build.GLYPHS }))
+                if (ENTITY.has(eId, new COMPONENT[2] { COMPONENT.POSITION, COMPONENT.GLYPH }))
                 {
-                    Position p = (Position) game.build.POSITIONS.data[eId];
+                    Position p = (Position) ComponentManager.get(COMPONENT.POSITION).data[eId];
 
                     if (p.x >= viewPortStart.x && p.x < viewPortEnd.x && p.y >= viewPortStart.y && p.y < viewPortEnd.y)
                     {
                         t.x = p.x - viewPortStart.x;
                         t.y = p.y - viewPortStart.y;
-                        Glyph g = (Glyph) game.build.GLYPHS.data[eId];
+                        Glyph g = (Glyph) ComponentManager.get(COMPONENT.GLYPH).data[eId];
                         term.at(t.x, t.y, g.c, g.color, termChar.background);
                     }
                 }
-                //if (!activeCreatures.Contains(r.creatureList[i]) && r.creatureList[i] != game.player) activeCreatures.Push(r.creatureList[i]);
             }
         }
     }
