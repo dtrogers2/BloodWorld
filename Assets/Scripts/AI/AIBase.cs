@@ -6,31 +6,35 @@ using UnityEngine;
 
 public class AIBase : IAI
 {
-    public bool turn(Creature me, Creature tgt, IGame game, out float actionCost)
+    public bool turn(uint me, uint tgt, IGame game, out float actionCost)
     {
         ICmd cmd;
         Vector3Int dir = Vector3Int.zero;
-        float tgtDistance = Vector3Int.Distance(me.position, tgt.position);
+        Position p1 = (Position) game.build.POSITIONS.data[me];
+        Position p2 = (Position) game.build.POSITIONS.data[me];
+        Vector3Int mePos = new Vector3Int(p1.x, p1.y, p1.z);
+        Vector3Int tgtPos = new Vector3Int(p2.x, p2.y, p2.z);
+        float tgtDistance = Vector3Int.Distance(mePos, tgtPos);
         if (tgtDistance <= 10)
         {
             if (tgtDistance < 2)
             {
-                dir = new Vector3Int(Math.Sign(0f + tgt.position.x - me.position.x), Math.Sign(tgt.position.y - me.position.y), me.position.z);
+                dir = new Vector3Int(Math.Sign(0f + tgtPos.x - mePos.x), Math.Sign(tgtPos.y - mePos.y), mePos.z);
                 // Move directly to target
             }
             else if (tgtDistance >= 2)
             {
-                if (Visbility.canSee(tgt.position, me.position, game, false))
+                if (Visbility.canSee(tgtPos, mePos, game, false))
                 {
                     // if it has unobstructed line, move directly towards target
-                    dir = new Vector3Int(Math.Sign(0f + tgt.position.x - me.position.x), Math.Sign(tgt.position.y - me.position.y), me.position.z);
+                    dir = new Vector3Int(Math.Sign(0f + tgtPos.x - mePos.x), Math.Sign(tgtPos.y - mePos.y), mePos.z);
 
                 }
                 else
                 {
-                    //dir = new Vector3Int(Math.Sign(0f + tgt.position.x - me.position.x), Math.Sign(tgt.position.y - me.position.y), me.position.z);
+                    dir = new Vector3Int(Math.Sign(0f + tgtPos.x - mePos.x), Math.Sign(tgtPos.y - mePos.y), mePos.z);
                     // Obstructed line towards target, find a path to the target
-                    pathNext(game, me.position, tgt.position, out dir);
+                    //pathNext(game, mePos, tgtPos, out dir);
                 }
             }
             cmd = new BumpCmd(new Vector3Int(dir.x, dir.y, 0), me, game);

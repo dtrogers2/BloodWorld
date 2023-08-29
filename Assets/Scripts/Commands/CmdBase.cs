@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class CmdBase : ICmd
 {
-    public Creature me { get; }
+    public uint me { get; }
 
     public IGame game { get; }
-    public CmdBase(Creature me, IGame game)
+    public CmdBase(uint me, IGame game)
     {
         this.me = me;
         this.game = game;

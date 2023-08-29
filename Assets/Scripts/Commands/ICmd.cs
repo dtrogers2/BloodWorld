@@ -7,7 +7,7 @@ public interface ICmd
     public bool exc();
     public bool turn(out float actionCost);
     public bool raw();
-    public Creature me { get; }
+    public uint me { get; }
     public IGame game { get; }
     public ICmd setDir(Vector2Int dir);
 }

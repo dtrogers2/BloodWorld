@@ -13,7 +13,7 @@ public class OverScreen : IScreen
 
     public void draw(ITerm term)
     {
-        term.txt(1, 1, "You died!", ColorHex.Red_Bright, ColorHex.Black, "");
+        term.txt(1, 1, "You died!", ColorHex.Red, ColorHex.Black);
     }
 
     public void onKey(KeyCode keycode, IStack stack)

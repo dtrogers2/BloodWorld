@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class BaseScreen : IScreen
@@ -16,44 +17,48 @@ public class BaseScreen : IScreen
 
     virtual public void draw(ITerm term)
     {
-        DrawScreen.drawMapPlayer(term, game.player.position, game);
+        Position p = (Position) game.build.POSITIONS.data[game.playerId];
+        Vector3Int pos = new Vector3Int(p.x, p.y, p.z);
+        DrawScreen.drawMapPlayer(term, pos, game);
         DrawScreen.renderHUD(term, game);
         DrawScreen.renderMsgs(term, game);
     }
 
     public void npcTurns(IStack stack, float actionCost)
     {
-        Creature player = game.player;
-        Stack<Creature> activeCreatures = new Stack<Creature>();
-        Stack<IRegion> regions = game.world.getRegions(player.position, 1, game);
+        Position p = (Position)game.build.POSITIONS.data[game.playerId];
+        Vector3Int pos = new Vector3Int(p.x, p.y, p.z);
+        Stack<uint> activeCreatures = new Stack<uint>();
+        Stack<IRegion> regions = game.world.getRegions(pos, 1, game);
         while (regions.Count > 0)
         {
             IRegion r = regions.Pop();
-            for (int i = 0; i < r.creatureList.Count; i++)
+            for (int i = 0; i < r.entities.Count; i++)
             {
-                if (!activeCreatures.Contains(r.creatureList[i]) && r.creatureList[i] != game.player) activeCreatures.Push(r.creatureList[i]);
+                if (r.entities.ElementAt(i) != game.playerId && !activeCreatures.Contains(r.entities.ElementAt(i))) activeCreatures.Push(r.entities.ElementAt(i));
             }
         }
         for (int i = activeCreatures.Count; i > 0; i--)
         {
-            npcTurn(activeCreatures.Pop(), game.player);
+            //insert logic to find nearest active creature it cares about
+            npcTurn(activeCreatures.Pop(), game.playerId);
         }
         handleMsgs(stack);
         finishPlayerTurn();
     }
-    public void npcTurn(Creature me, Creature tgt)
+    public void npcTurn(uint me, uint tgt)
     {
         
-        me.actionCost -= tgt.actionCost;
+        //me.actionCost -= tgt.actionCost;
         IAI ai = game.ai;
-        if (ai != null && me.actionCost <= 0) 
+        if (ai != null /*&& me.actionCost <= 0*/) 
         {
-            while (me.actionCost <= 0)
-            {
+           // while (me.actionCost <= 0)
+            //{
                 float newCost = 0.0f;
                 ai.turn(me, tgt, game, out newCost);
-                me.actionCost += newCost;
-            }
+            //    me.actionCost += newCost;
+            //}
         }
     }
 

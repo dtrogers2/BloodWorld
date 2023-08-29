@@ -18,7 +18,7 @@ public class LogScreen : BaseScreen
         for (int y = 0; y < range; y++)
         {
             string s = DrawScreen.extend(msgLog[y], term);
-            term.txt(3, 1 + y, s, ColorHex.White, ColorHex.Black, " ");
+            term.txt(0, 1 + y, s, ColorHex.White, ColorHex.Black);
         }
     }
 

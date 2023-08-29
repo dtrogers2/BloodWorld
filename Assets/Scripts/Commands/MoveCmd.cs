@@ -5,21 +5,23 @@ using UnityEngine;
 public class MoveCmd : CmdBase
 {
     Vector3Int dir;
-    public MoveCmd(Vector3Int dir, Creature me, IGame game) : base(me, game)
+    public MoveCmd(Vector3Int dir, uint me, IGame game) : base(me, game)
     {
         this.dir = dir;
     }
 
     public override bool exc()
     {
-        Vector3Int newPos = me.position + dir;
+        Position p = (Position) game.build.POSITIONS.data[me];
+        Vector3Int newPos = new Vector3Int(p.x + dir.x, p.y + dir.y, p.z + dir.z);
+        //bool legal = game.world.moveEntity(me, newPos, game);
         bool legal = game.world.moveEntity(me, newPos, game);
         return legal;
     }
 
     public override bool turn(out float actionCost)
     {
-        actionCost = me.baseMoveCost;
+        actionCost = 1.0f;
         return this.exc();
     }
 

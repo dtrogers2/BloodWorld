@@ -6,6 +6,5 @@ public struct TermChar
 {
     public string foreground;
     public string background;
-    public string special;
     public char c;
 }

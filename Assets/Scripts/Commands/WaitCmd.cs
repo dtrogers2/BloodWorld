@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class WaitCmd : CmdBase
 {
-    public WaitCmd(Creature me, IGame game) : base(me, game)
+    public WaitCmd(uint me, IGame game) : base(me, game)
     {
 
     }

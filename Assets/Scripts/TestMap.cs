@@ -34,9 +34,9 @@ public class TestMap
 {
     public static IRegion test(Vector2Int dim, Vector3Int regionPos, Rng rng)
     {
-        Wall wall = new Wall(new Vector3Int(), "Wall", true, true, new TermChar { background = ColorHex.Black, c = '#', foreground = ColorHex.White_Dark, special = "" });
+        Wall wall = new Wall(new Vector3Int(), "Wall", true, true, new TermChar { background = ColorHex.Black, c = '#', foreground = ColorHex.Gray });
         Vector2Int p = new Vector2Int();
-        Region map = new Region(dim, regionPos, new TermChar { background = ColorHex.Black, c = '.', foreground = ColorHex.White_Dark, special = "" });
+        Region map = new Region(dim, regionPos, new TermChar { background = ColorHex.Black, c = '.', foreground = ColorHex.Gray });
         for (p.y = 0; p.y < dim.y; p.y++)
         {
             for (p.x = 0; p.x < dim.x; p.x++)

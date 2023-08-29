@@ -4,14 +4,14 @@ using UnityEngine;
 
 public class ParseCommand
 {
-    public Creature player;
+    public uint player;
     public IGame game;
     public IScreenMaker maker;
     public ParseCommand(IGame game, IScreenMaker maker)
     {
         this.game = game;
         this.maker = maker;
-        this.player = game.player;
+        this.player = game.playerId;
     }
 
     public bool parseKeycodeTurn(KeyCode c, IStack ss, out float actionCost)

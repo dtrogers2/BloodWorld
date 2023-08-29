@@ -1,7 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data.Common;
 using UnityEngine;
+using UnityEngine.UIElements;
 using static UnityEditor.PlayerSettings;
 
 public class World
@@ -83,6 +85,42 @@ public class World
         return false;
     }
 
+
+    public bool getCellFlags(Vector3Int worldPos, IGame game, out uint cellBits)
+    {
+        cellBits = 0;
+        Vector2Int stockTerm = Term.StockDim();
+        if (worldPos.x >= 0 && worldPos.x < worldDim.x * stockTerm.x && worldPos.y >= 0 && worldPos.y < worldDim.y * stockTerm.y && worldPos.z >= 0 && worldPos.z < worldDim.z)
+        {
+            if (getRegion(worldPos, game, out IRegion r))
+            {
+
+                cellBits = r.getCellFlags(worldPos);
+                if (cellBits == 0) { return false; }
+
+                return true;
+            }
+        }
+        return false;
+    }
+    public bool getCellEntity(Vector3Int worldPos, IGame game, out uint cellBits)
+    {
+        cellBits = 0;
+        Vector2Int stockTerm = Term.StockDim();
+        if (worldPos.x >= 0 && worldPos.x < worldDim.x * stockTerm.x && worldPos.y >= 0 && worldPos.y < worldDim.y * stockTerm.y && worldPos.z >= 0 && worldPos.z < worldDim.z)
+        {
+            if (getRegion(worldPos, game, out IRegion r))
+            {
+                
+                cellBits = r.getCellEntity(worldPos);
+                if (cellBits == 0) { return false; }
+                
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void add(IRegion region, Vector3Int pos)
     {
         regions[pos.x, pos.y, pos.z] = region;
@@ -119,6 +157,30 @@ public class World
         return false;
     }
 
+    public bool moveEntity(uint c, Vector3Int dest, IGame game)
+    {
+        if (getCellFlags(dest, game, out uint cell))
+        {
+            if (!ENTITY.bitHas(cell, (uint) CELLFLAG.BLOCKED))
+            {
+                if (removeEntity(c, game))
+                {
+                    game.build.POSITIONS.data[c] = new Position { x = dest.x, y = dest.y, z = dest.z };
+                    if (addEntity(c, game))
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        throw new System.Exception("Entity was removed but not added in moveEntity()!!!");
+                    }
+                }
+                return false;
+            }
+        }
+        return false;
+    }
+
     public bool removeEntity(Creature c, IGame game)
     {
         if (getRegion(c.position, game, out IRegion r))
@@ -138,6 +200,37 @@ public class World
         }
         return false;
     }
+
+    public bool removeEntity(uint c, IGame game)
+    {
+        if (ENTITY.has(c, game.build.POSITIONS))
+        {
+            Position p = (Position) game.build.POSITIONS.data[c];
+            if (getRegion(new Vector3Int(p.x, p.y, p.z), game, out IRegion r))
+            {
+                r.removeEntity(c);
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    public bool addEntity(uint c, IGame game)
+    {
+        if (ENTITY.has(c, game.build.POSITIONS))
+        {
+           
+            Position p = (Position) game.build.POSITIONS.data[c];
+            if (getRegion(new Vector3Int(p.x, p.y, p.z), game, out IRegion r))
+                {
+                    r.addEntity(c);
+                    return true;
+                }
+        }
+        return false;
+    }
+
     public Vector3Int worldPosition(Vector3Int regionPos)
     {
         Vector2Int regionDim = Term.StockDim();

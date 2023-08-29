@@ -44,7 +44,7 @@ public class Tile : IComparer
         char c = (this.wall != null) ? wall.glyph : ( this.creature != null) ? creature.glyph :  this.floor.c;
         string fg = (this.wall != null) ? wall.color : (this.creature != null) ? creature.color :  this.floor.foreground;
         string bg = (this.creature != null) ? creature.bg() : this.floor.background;
-        return new TermChar { c = c, background = bg , foreground = fg, special = ""};
+        return new TermChar { c = c, background = bg , foreground = fg};
     }
 
     public void setG(Tile previous)

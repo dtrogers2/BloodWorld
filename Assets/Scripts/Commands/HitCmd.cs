@@ -6,8 +6,8 @@ using static Unity.Burst.Intrinsics.X86.Avx;
 
 public class HitCmd : CmdBase
 {
-    public Creature tgt { get; }
-    public HitCmd(Creature me, Creature tgt, IGame game) : base(me, game)
+    public uint tgt { get; }
+    public HitCmd(uint me, uint tgt, IGame game) : base(me, game)
     {
         this.tgt = tgt;
     }
@@ -21,15 +21,16 @@ public class HitCmd : CmdBase
 
     public override bool turn(out float actionCost)
     {
-        actionCost = me.baseAtkCost;
+        actionCost = 1.0f;
         return exc();
     }
 
-    public void doDmg(int dmg, Creature tgt, Creature src, IGame game)
+    public void doDmg(int dmg, uint tgt, uint src, IGame game)
     {
-        string s = (dmg > 0) ? $"{src.name} hits {tgt.name}" : $"{src.name} misses {tgt.name}";
-        tgt.hp -= dmg;
-        if (tgt.hp < 1) mobDies(tgt, game);
+        string s = (dmg > 0) ? $"{src} hits {tgt}" : $"{src} misses {tgt}";
+        //TODO add Hit Dice component
+        //tgt.hp -= dmg;
+        //if (tgt.hp < 1) mobDies(tgt, game);
         game.msg(s);
     }
 
@@ -42,7 +43,7 @@ public class HitCmd : CmdBase
         }
     }
 
-    public int calcDmg(Rng rng, Creature src)
+    public int calcDmg(Rng rng, uint src)
     {
         return 1;
     }

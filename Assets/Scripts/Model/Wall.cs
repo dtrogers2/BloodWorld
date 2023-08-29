@@ -10,7 +10,7 @@ public class Wall : IEntity
 
     public char glyph { get; set; } = '#';
 
-    public string color { get; set; } = ColorHex.White_Dark;
+    public string color { get; set; } = ColorHex.Gray;
     public bool opaque = true;
     public bool blocks = true;
 

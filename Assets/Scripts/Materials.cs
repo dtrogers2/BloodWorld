@@ -22,9 +22,9 @@ public enum State
 public readonly struct ElementColor
 {
     public const string None = ColorHex.Black;
-    public const string Blood = ColorHex.Red_Bright;
-    public const string Stone = ColorHex.White_Dark;
-    public const string Water = ColorHex.Blue_Bright;
+    public const string Blood = ColorHex.Red;
+    public const string Stone = ColorHex.Gray;
+    public const string Water = ColorHex.Blue;
     public const string Glass = ColorHex.White;
 
     public static string ColorFromElement(Element element)

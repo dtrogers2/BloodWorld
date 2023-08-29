@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,9 +6,11 @@ using UnityEngine;
 public class Rng
 {
     protected int seed;
+    protected System.Random rand;
     public Rng(int seed)
     {
         this.seed = seed;
+        this.rand = new System.Random(seed);
     }
     public int getSeed() { return this.seed; }
     public void setSeed(int seed) { this.seed = seed; }
@@ -32,9 +35,9 @@ public class Rng
             higher = swap;
         }
 
-        int range = higher - lower;
-        float draw = this.srand() * range;
-        int roll = Mathf.FloorToInt(draw) + lower;
+        //int range = higher - lower;
+        //float draw = this.srand() * range;
+        int roll = rand.Next(lower, higher);//Mathf.FloorToInt(draw) + lower;
         return roll;
     }
 
@@ -55,5 +58,11 @@ public class Rng
     public bool oneIn(int n)
     {
         return (this.rng(n) == 0);
+    }
+
+    public bool pct(int chance)
+    {
+        int roll = this.rngC(1, 100);
+        return (roll <= chance);
     }
 }

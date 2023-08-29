@@ -13,11 +13,11 @@ public interface ITerm
 {
     Vector2Int dim { get; }
     TermChar[,] tpoint { get; }
-    void txt(Vector2Int position, string s, string foreground, string background, string special);
-    void at(Vector2Int position, char c, string foreground, string background, string special);
+    void txt(Vector2Int position, string s, string foreground, string background);
+    void at(Vector2Int position, char c, string foreground, string background);
 
-    void txt(int x, int y, string s, string foreground, string background, string special);
-    void at(int x, int y, char c, string foreground, string background, string special);
+    void txt(int x, int y, string s, string foreground, string background);
+    void at(int x, int y, char c, string foreground, string background);
     void clear();
     void init();
 }
@@ -34,48 +34,46 @@ public class Term : ITerm
         {
             for (int x = 0; x < dim.x; x++)
             {
-                this.tpoint[x, y] = new TermChar { foreground = ColorHex.Black, background = ColorHex.Black, c = '?', special = "" };
+                this.tpoint[x, y] = new TermChar { foreground = ColorHex.Black, background = ColorHex.Black, c = '?'};
             }
         }
     }
 
-     public void txt(Vector2Int position, string s, string foreground, string background, string special)
+     public void txt(Vector2Int position, string s, string foreground, string background)
     {
         char[] chars = s.ToCharArray();
         for (int x = 0; x < s.Length; x++)
         {
-            this.at(new Vector2Int(position.x + x, position.y), chars[x], foreground, background, special);
+            this.at(new Vector2Int(position.x + x, position.y), chars[x], foreground, background);
         }
     }
 
-    virtual public void at(Vector2Int position, char c, string foreground, string background, string special)
+    virtual public void at(Vector2Int position, char c, string foreground, string background)
     {
         if (position.x >= 0 && position.y >= 0 && position.x < this.dim.x && position.y < this.dim.y)
         {
             this.tpoint[position.x, position.y].foreground =  foreground;
             this.tpoint[position.x, position.y].background = background;
             this.tpoint[position.x, position.y].c = c;
-            this.tpoint[position.x, position.y].special = "";
         }
     }
 
-     public void txt(int x, int y, string s, string foreground, string background, string special = "")
+     public void txt(int x, int y, string s, string foreground, string background)
     {
         char[] chars = s.ToCharArray();
         for (int c = 0; c < s.Length; c++)
         {
-            this.at(new Vector2Int(x + c, y), chars[c], foreground, background, special);
+            this.at(new Vector2Int(x + c, y), chars[c], foreground, background);
         }
     }
 
-    virtual public void at(int x, int y, char c, string foreground, string background, string special = "")
+    virtual public void at(int x, int y, char c, string foreground, string background)
     {
         if (x >= 0 && y >= 0 && x < this.dim.x && y < this.dim.y)
         {
             this.tpoint[x, y].foreground = foreground;
             this.tpoint[x, y].background = background;
             this.tpoint[x, y].c = c;
-            this.tpoint[x, y].special = "";
         }
     }
 
@@ -88,7 +86,6 @@ public class Term : ITerm
                 this.tpoint[x, y].foreground = ColorHex.Black;
                 this.tpoint[x, y].background = ColorHex.Black;
                 this.tpoint[x, y].c = '?';
-                this.tpoint[x, y].special = "";
             }
         }
     }
@@ -118,9 +115,9 @@ public class GTerm : Term
         this.init();
     }
 
-    public override void at(Vector2Int position, char c, string foreground, string background, string special)
+    public override void at(Vector2Int position, char c, string foreground, string background)
     {
-        base.at(position, c, foreground, background, special);
+        base.at(position, c, foreground, background);
 
         if (position.x >= 0 && position.y >= 0 && position.x < this.dim.x && position.y < this.dim.y)
         {
@@ -131,9 +128,9 @@ public class GTerm : Term
         }
     }
 
-    public override void at(int x, int y, char c, string foreground, string background, string special)
+    public override void at(int x, int y, char c, string foreground, string background)
     {
-        base.at(x, y, c, foreground, background, special);
+        base.at(x, y, c, foreground, background);
 
         if (x >= 0 && y >= 0 && x < this.dim.x && y < this.dim.y)
         {
@@ -170,7 +167,7 @@ public class GTerm : Term
         {
             for (int x = 0; x < dim.x; x++)
             {
-                this.at(x, y, this.tpoint[x, y].c, this.tpoint[x, y].foreground, this.tpoint[x, y].background, "");
+                this.at(x, y, this.tpoint[x, y].c, this.tpoint[x, y].foreground, this.tpoint[x, y].background);
                 fgSprite[x, y].sprite = spriteSheet[0];
                 fgSprite[x, y].color = HexToColor(this.tpoint[x, y].foreground);
                 bgSprite[x, y].sprite= spriteSheet[219];
@@ -198,9 +195,9 @@ public class TestTerm
     public static void test(ITerm term)
     {
         term.init();
-        term.at(0, 0, 'c', ColorHex.White, ColorHex.Black, "");
+        term.at(0, 0, 'c', ColorHex.White, ColorHex.Black);
 
-        term.txt(1, 1, "Testing...", ColorHex.Blue_Bright, ColorHex.Yellow_Dark, "");
+        term.txt(1, 1, "Testing...", ColorHex.Blue, ColorHex.YellowDark);
 
     }
 
@@ -215,12 +212,12 @@ public class TestTerm
                 int nc = (n % 26) + 'a';
                 char c = (char)nc;
                 string bg = '#' + Convert.ToString(((n + 0) % 16),16) + Convert.ToString(((n + 5) % 16),16) + Convert.ToString(((n + 10) % 16),16);
-                term.at(x, y, c, ColorHex.White, bg, "");
+                term.at(x, y, c, ColorHex.White, bg);
             }
         }
 
-        term.txt(2, 1, "##.##", ColorHex.White, ColorHex.Black, "");
-        term.txt(2, 2, "#@.k!", ColorHex.White, ColorHex.Black, "");
-        term.txt(2, 3, str, ColorHex.Yellow_Bright, ColorHex.Red_Dark, "");
+        term.txt(2, 1, "##.##", ColorHex.White, ColorHex.Black);
+        term.txt(2, 2, "#@.k!", ColorHex.White, ColorHex.Black);
+        term.txt(2, 3, str, ColorHex.Yellow, ColorHex.RedDark);
     }
 }
