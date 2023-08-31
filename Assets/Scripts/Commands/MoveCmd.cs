@@ -21,6 +21,13 @@ public class MoveCmd : CmdBase
     public override bool turn(out float actionCost)
     {
         actionCost = 1.0f;
+        if (ENTITY.has(me, COMPONENT.CREATURE))
+        {
+            Creature meC = (Creature)ComponentManager.get(COMPONENT.CREATURE).data[me];
+            actionCost = meC.moveRate;
+
+        }
+
         return this.exc();
     }
 

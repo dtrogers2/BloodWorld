@@ -2,11 +2,14 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Text;
 using Unity.VisualScripting;
 using Unity.VisualScripting.Dependencies.NCalc;
 using UnityEngine;
+using UnityEngine.Assertions;
 using UnityEngine.UIElements;
 using UnityEngine.WSA;
+using static UnityEditorInternal.ReorderableList;
 using ColorUtility = UnityEngine.ColorUtility;
 
 public interface ITerm
@@ -121,6 +124,7 @@ public class GTerm : Term
 
         if (position.x >= 0 && position.y >= 0 && position.x < this.dim.x && position.y < this.dim.y)
         {
+
             fgSprite[position.x, position.y].sprite = spriteSheet[(int)c];
             fgSprite[position.x, position.y].color = HexToColor(foreground);
             bgSprite[position.x, position.y].sprite = spriteSheet[219];

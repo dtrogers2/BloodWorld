@@ -5,9 +5,6 @@ using UnityEngine;
 
 public interface IBuild
 {
-    public Wall defaultWall { get; }
-    public uint wallId { get; set; }
-    public uint floorId { get; set; }
     public IGame makeGame();
     public IRegion makeLevel(IGame game, Vector3Int regionPos, bool addMobs = false);
 }

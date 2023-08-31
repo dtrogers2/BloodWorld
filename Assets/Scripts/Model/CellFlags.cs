@@ -16,4 +16,5 @@ public enum CELLFLAG : uint
     OPAQUE = 1 << 2, // 4
     EXPLORE_HORIZON = 1 << 3,//8
     MORE_ITEMS = 1 << 4, //16
+    CREATURE = 1 << 5,
 }

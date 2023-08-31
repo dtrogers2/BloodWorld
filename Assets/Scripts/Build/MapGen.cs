@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,12 +8,10 @@ public class MapGen
 {
     public IGame game;
     public Rng rng;
-    public Wall wall;
-    public MapGen(IGame game, Rng rng, Wall wall)
+    public MapGen(IGame game, Rng rng)
     {
         this.game = game;
         this.rng = rng;
-        this.wall = wall;
     }
 
 
@@ -22,7 +21,7 @@ public class MapGen
         {
             for (int x = 0; x < map.dim.x; x++)
             {
-               map.setCellEntity(game.build.floorId, new Vector3Int(x, y));
+               map.setCellEntity(Env.get(ENV.FLOOR), new Vector3Int(x, y));
             }
         }
         int num = 50;
@@ -35,7 +34,118 @@ public class MapGen
             draw(map, UL, XT, filled);
             
         }
+        adjustWalls(map);
         return map;
+    }
+
+    public void adjustWalls(IRegion map)
+    {
+        for (int y = 0; y < map.dim.y; y++)
+        {
+            for (int x = 0; x < map.dim.x; x++)
+            {
+                if (y == 0 || y == map.dim.y || x == 0 || x == map.dim.x) continue;
+                uint dirFlags = (uint) DIR.CENTER;
+                uint diagFlags = (uint)DIR.ALL ;
+                if (!ENTITY.bitHas(map.getCellFlags(new Vector3Int(x, y)), (uint) CELLFLAG.BLOCKED)) { continue; }
+
+                if (!ENTITY.bitHas(map.getCellFlags(new Vector3Int(x - 1,    y - 1)), (uint) CELLFLAG.BLOCKED)) diagFlags = ENTITY.bitDel(diagFlags, (uint) DIR.NORTHWEST);
+                if (ENTITY.bitHas(map.getCellFlags(new Vector3Int(x,        y - 1)), (uint)CELLFLAG.BLOCKED)) dirFlags = ENTITY.bitSet(dirFlags, (uint)DIR.NORTH);
+                if (!ENTITY.bitHas(map.getCellFlags(new Vector3Int(x + 1,    y - 1)), (uint)CELLFLAG.BLOCKED)) diagFlags = ENTITY.bitDel(diagFlags, (uint)DIR.NORTHEAST);
+
+                if (ENTITY.bitHas(map.getCellFlags(new Vector3Int(x - 1,    y)), (uint)CELLFLAG.BLOCKED)) dirFlags = ENTITY.bitSet(dirFlags, (uint)(DIR.WEST));
+                if (ENTITY.bitHas(map.getCellFlags(new Vector3Int(x + 1,    y)), (uint)CELLFLAG.BLOCKED)) dirFlags = ENTITY.bitSet(dirFlags, (uint)(DIR.EAST));
+
+                if (!ENTITY.bitHas(map.getCellFlags(new Vector3Int(x - 1,    y + 1)), (uint)CELLFLAG.BLOCKED)) diagFlags = ENTITY.bitDel(diagFlags, (uint)DIR.SOUTHWEST);
+                if (ENTITY.bitHas(map.getCellFlags(new Vector3Int(x,        y + 1)), (uint)CELLFLAG.BLOCKED)) dirFlags = ENTITY.bitSet(dirFlags, (uint)DIR.SOUTH);
+                if (!ENTITY.bitHas(map.getCellFlags(new Vector3Int(x + 1,    y + 1)), (uint)CELLFLAG.BLOCKED)) diagFlags = ENTITY.bitDel(diagFlags, (uint)DIR.SOUTHEAST );
+
+                
+                switch(dirFlags)
+                {
+                    case 3: map.setCellEntity(Env.get(ENV.WALL_WE), new Vector3Int(x, y)); break;
+                    case 5: map.setCellEntity(Env.get(ENV.WALL_WE), new Vector3Int(x, y)); break;
+                    case 7: map.setCellEntity(Env.get(ENV.WALL_WE), new Vector3Int(x, y)); break;
+                    case 15: map.setCellEntity(Env.get(ENV.WALL_WE), new Vector3Int(x, y)); break;
+                    case 23:  map.setCellEntity(Env.get(ENV.WALL_WE), new Vector3Int(x, y)); break;
+                    case 9: map.setCellEntity(Env.get(ENV.WALL_NS), new Vector3Int(x, y)); break;
+                    case 17: map.setCellEntity(Env.get(ENV.WALL_NS), new Vector3Int(x, y)); break;
+                    case 29: map.setCellEntity(Env.get(ENV.WALL_NS), new Vector3Int(x, y)); break;
+                    case 27: map.setCellEntity(Env.get(ENV.WALL_NS), new Vector3Int(x, y)); break;
+                    case 25: map.setCellEntity(Env.get(ENV.WALL_NS), new Vector3Int(x, y)); break;
+                    case 21: map.setCellEntity(Env.get(ENV.WALL_NW), new Vector3Int(x, y)); break;
+                    case 13: map.setCellEntity(Env.get(ENV.WALL_NE), new Vector3Int(x, y)); break;
+                    case 19: map.setCellEntity(Env.get(ENV.WALL_SW), new Vector3Int(x, y)); break;
+                    case 11: map.setCellEntity(Env.get(ENV.WALL_SE), new Vector3Int(x, y)); break;
+                    case 31:
+                        {
+                           
+                            switch(diagFlags)
+                            {
+                                case (uint)DIR.ALL: break;
+                                case 479: map.setCellEntity(Env.get(ENV.WALL_SE), new Vector3Int(x, y)); break;
+                                case 447: map.setCellEntity(Env.get(ENV.WALL_SW), new Vector3Int(x, y)); break;
+                                case 383: map.setCellEntity(Env.get(ENV.WALL_NE), new Vector3Int(x, y)); break;
+                                case 255: map.setCellEntity(Env.get(ENV.WALL_NW), new Vector3Int(x, y)); break;
+                                default: break;
+                            }
+                            break;
+                        }
+                     
+                    default: break;
+                }
+                /*
+                bool noDiag = true;
+                if (ENTITY.bitHas(dirFlags, (uint)(DIR.NORTH | DIR.SOUTH | DIR.WEST | DIR.EAST))
+                    && (ENTITY.bitHas(dirFlags, (uint)DIR.NORTHWEST) || ENTITY.bitHas(dirFlags, (uint)DIR.NORTHEAST)
+                    || ENTITY.bitHas(dirFlags, (uint)DIR.SOUTHEAST) || ENTITY.bitHas(dirFlags, (uint)DIR.SOUTHWEST)))
+                noDiag = false;*/
+               // switch(dirFlags) {
+                //    case unchecked((uint)DIR.NORTH | (uint) DIR.SOUTH):
+                //    case  unchecked((~((uint)DIR.WEST ^ (uint)DIR.EAST) & ((uint)DIR.NORTH | (uint)DIR.SOUTH)) | ((uint) DIR.NORTH ^ (uint) DIR.SOUTH)): map.setCellEntity(Env.get(ENV.WALL_WE), new Vector3Int(x, y)); break;
+                //    default: break;
+                //}
+
+
+                /*
+                if (ENTITY.bitHas(dirFlags, (uint) (DIR.NORTH | DIR.SOUTH)) && !ENTITY.bitHas(dirFlags, (uint)(DIR.WEST | DIR.EAST)))
+                {
+                    map.setCellEntity(Env.get(ENV.WALL_WE), new Vector3Int(x, y));
+                    continue;
+                }
+
+                if (ENTITY.bitHas(dirFlags, (uint)(DIR.WEST | DIR.EAST)) && !ENTITY.bitHas(dirFlags, (uint)(DIR.NORTH | DIR.SOUTH)))
+                {
+                    map.setCellEntity(Env.get(ENV.WALL_NS), new Vector3Int(x, y));
+                    continue;
+                }
+
+                if (ENTITY.bitHas(dirFlags, (uint)(DIR.NORTH | DIR.WEST)) && !ENTITY.bitHas(dirFlags, (uint)(DIR.EAST | DIR.SOUTH)))
+                {
+                    map.setCellEntity(Env.get(ENV.WALL_SE), new Vector3Int(x, y));
+                    continue;
+                }
+
+                if (ENTITY.bitHas(dirFlags, (uint)(DIR.NORTH | DIR.EAST)) && !ENTITY.bitHas(dirFlags, (uint)(DIR.WEST | DIR.SOUTH)))
+                {
+                    map.setCellEntity(Env.get(ENV.WALL_SW), new Vector3Int(x, y));
+                    continue;
+                }
+
+                if (ENTITY.bitHas(dirFlags, (uint)(DIR.SOUTH | DIR.WEST)) && !ENTITY.bitHas(dirFlags, (uint)(DIR.NORTH | DIR.EAST)))
+                {
+                    map.setCellEntity(Env.get(ENV.WALL_NE), new Vector3Int(x, y));
+                    continue;
+                }
+
+                if (ENTITY.bitHas(dirFlags, (uint)(DIR.SOUTH | DIR.EAST)) && !ENTITY.bitHas(dirFlags, (uint)(DIR.NORTH | DIR.WEST)))
+                {
+                    map.setCellEntity(Env.get(ENV.WALL_NW), new Vector3Int(x, y));
+                    continue;
+                }*/
+
+            }
+        }
     }
 
     public void pick(IRegion map, Vector3Int UL, Vector3Int XT, out Vector3Int UL2, out Vector3Int XT2)
@@ -58,7 +168,6 @@ public class MapGen
 
     public void draw(IRegion map, Vector3Int UL, Vector3Int XT, bool filled)
     {
-        Wall center = (filled) ? wall : null;
         int x2 = XT.x - 1;
         int y2 = XT.y - 1;
         List<Vector3Int> seconds = new List<Vector3Int>();
@@ -71,17 +180,14 @@ public class MapGen
                 p.x = x + UL.x;
                 bool edge = (x == 0 || y == 0 || x == XT.x || y == XT.y);
                 bool secs = (x == 1 || y == 1 || x == x2 || y == y2);
-                Wall w = edge ? null : (secs) ? wall : center;
-
-                map.tile(p).wall = w;
-                map.setCellEntity(game.build.floorId, p);
+                //map.setCellEntity(game.build.floorId, p);
+                map.setCellEntity(Env.get(ENV.FLOOR), p);
                 map.delCellFlags(CELLFLAG.BLOCKED | CELLFLAG.OPAQUE, p);
 
                 if (!edge && (secs || filled))
                 {
                     map.setCellFlags(CELLFLAG.BLOCKED | CELLFLAG.OPAQUE, p);
-                    map.setCellEntity(game.build.wallId, p);
-                    
+                    map.setCellEntity(Env.get(ENV.WALL), p);
                 }
                 if (edge) seconds.Add(p);
             }
@@ -96,19 +202,18 @@ public class MapGen
             int ix = rng.rng(0, edges.Count);
             if (ix < edges.Count)
             {
-                map.tile(edges[ix]).wall = null;
                 //map.removeCellEntity(edges[ix]);
                 map.delCellFlags(CELLFLAG.BLOCKED | CELLFLAG.OPAQUE, edges[ix]);
-                map.setCellEntity(game.build.floorId, edges[ix]);
+                map.setCellEntity(Env.get(ENV.FLOOR), edges[ix]);
             }
             
         }
     }
 
-    public static IRegion test(IGame game, Vector3Int regionPos, Rng rng, Wall wall)
+    public static IRegion test(IGame game, Vector3Int regionPos, Rng rng)
     {
         Vector2Int dim = Term.StockDim();
-        MapGen gen = new MapGen(game, rng, wall);
+        MapGen gen = new MapGen(game, rng);
         Region map = new Region(dim, regionPos, new TermChar { background = ColorHex.Black, c = '.', foreground = ColorHex.GrayDark });
         return gen.loop(map, rng);
     }
@@ -129,3 +234,19 @@ public struct Room
     public bool isHall;
     public bool hasHall;
 }
+
+[Flags]
+public enum DIR
+{
+    NONE = 0,
+    CENTER = 1, // 1
+    NORTH = 1 << 1, // 2
+    SOUTH = 1 << 2, // 4
+    WEST = 1 << 3, // 8
+    EAST = 1 << 4, // 16
+    NORTHWEST = 1 << 5, // 32
+    NORTHEAST = 1 << 6, // 64
+    SOUTHWEST = 1 << 7, // 128
+    SOUTHEAST = 1 << 8, // 256
+    ALL = 511
+} 

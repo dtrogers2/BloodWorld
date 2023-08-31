@@ -5,44 +5,63 @@ using UnityEngine.TextCore.LowLevel;
 
 public class HealthAdj
 {
-    public static void adjust(Creature c, int amt, IGame game, Creature src = null)
+    public static void adjust(uint id, int amt, IGame game, uint srcId = uint.MaxValue)
     {
         if (amt == 0) return;
         if (amt > 0)
         {
-            heal(c, amt);
+            heal(id, amt);
             return;
         }
+
         if (amt < 0)
         {
-            dmg(c, -amt, game, src);
+            dmg(id, -amt, game, srcId);
             return;
         }
     }
 
-    public static void heal(Creature c, int amt)
+    public static void heal(uint  id, int amt)
     {
-        int limit = c.maxhp - c.hp;
-        if (amt > limit) amt = limit;
-        c.hp += amt;
-    }
-
-    public static void dmg(Creature c, int amt, IGame game, Creature src = null)
-    {
-        c.hp -= amt;
-        bool playerRelated = (c == game.player || (src != null && src == game.player));
-        if (c.hp <= 0) mobDies(c, game, playerRelated);
-    }
-
-    public static void mobDies(Creature c, IGame game, bool playerRelated)
-    {
-        string s = $"{c.name} dies";
-        if (playerRelated) game.msg(s);
-        if (c != game.player)
+        if (ENTITY.has(id, COMPONENT.CREATURE))
         {
-            game.world.removeEntity(c, game);
+            Creature c = (Creature)ComponentManager.get(COMPONENT.CREATURE).data[id];
+            int limit = c.hpMax - c.hp;
+            if (amt > limit) amt = limit;
+            c.hp += amt;
         }
-        dropItems();
+    }
+
+    public static void dmg(uint id, int amt, IGame game, uint srcId = uint.MaxValue)
+    {
+        if (ENTITY.has(id, COMPONENT.CREATURE))
+        {
+            Creature c = (Creature)ComponentManager.get(COMPONENT.CREATURE).data[id];
+            c.hp -= amt;
+            bool playerRelated = (id == game.playerId || (srcId != uint.MaxValue && srcId == game.playerId));
+            if (c.hp <= 0) mobDies(id, game, playerRelated);
+        }
+
+    }
+
+    public static void mobDies(uint id, IGame game, bool playerRelated)
+    {
+        if (ENTITY.has(id, COMPONENT.CREATURE))
+        {
+            Creature c = (Creature)ComponentManager.get(COMPONENT.CREATURE).data[id];
+            if (playerRelated)
+            {
+                string s = $"{c.name} dies";
+                game.msg(s);
+            }
+            if (id != game.playerId)
+            {
+                game.world.removeEntity(id, game);
+            }
+            ENTITY.unsubscribe(id, COMPONENT.CREATURE);
+            dropItems();
+        }
+
     }
 
     public static void dropItems()

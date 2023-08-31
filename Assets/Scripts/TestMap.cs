@@ -34,7 +34,6 @@ public class TestMap
 {
     public static IRegion test(Vector2Int dim, Vector3Int regionPos, Rng rng)
     {
-        Wall wall = new Wall(new Vector3Int(), "Wall", true, true, new TermChar { background = ColorHex.Black, c = '#', foreground = ColorHex.Gray });
         Vector2Int p = new Vector2Int();
         Region map = new Region(dim, regionPos, new TermChar { background = ColorHex.Black, c = '.', foreground = ColorHex.Gray });
         for (p.y = 0; p.y < dim.y; p.y++)
@@ -44,7 +43,6 @@ public class TestMap
                 bool edge = !(p.x > 0 && p.x < dim.x - 1 && p.y > 0 && p.y < dim.y - 1);
                 bool chance = rng.oneIn(4);
                 bool hasWall = (edge || chance);
-                if (chance) map.tile((Vector3Int) p).wall = wall;
 
             }
         }

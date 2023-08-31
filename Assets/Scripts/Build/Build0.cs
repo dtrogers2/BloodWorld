@@ -1,27 +1,18 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEngine.EventSystems.EventTrigger;
 
 public class Build : IBuild
 {
-    public Wall defaultWall { get; set; }
-
-    public uint wallId { get; set; }
-    public uint floorId { get; set; }
-
-    public uint emptyId { get; set; }
     public IGame makeGame()
     {
 
         initComponents();
         makeEnv();
         Rng rng = new Rng(42);
-        Creature player = makePlayer();
-        defaultWall = new Wall(new Vector3Int(), "Wall", true, true, new TermChar { background = ColorHex.Black, c = '#', foreground = ColorHex.Gray });
-        player.maxhp = 10000;
-        player.hp = 10000;
-        uint playerId = makePlayer2();
-        Game game = new Game(rng, player, playerId, this);
+        uint playerId = makePlayer();
+        Game game = new Game(rng, playerId, this);
         enterFirstLevel0(game);
         game.ai = makeAI();
         return game;
@@ -34,15 +25,16 @@ public class Build : IBuild
 
     public void makeEnv()
     {
-        Glyph wallGlyph = new Glyph { c = '#', color = ColorHex.White };
-        Glyph floorGlyph = new Glyph { c = '.', color = ColorHex.White };
-        Glyph emptyGlyph = new Glyph { c = ' ', color = ColorHex.Black };
-        emptyId = EntityManager.create();
-        ENTITY.subscribe(emptyId, emptyGlyph, COMPONENT.GLYPH);
-        wallId = EntityManager.create();
-        ENTITY.subscribe(wallId, wallGlyph, COMPONENT.GLYPH);
-        floorId = EntityManager.create();
-        ENTITY.subscribe(floorId, floorGlyph, COMPONENT.GLYPH);
+        Env.init();
+        //Glyph wallGlyph = new Glyph { c = '#', color = ColorHex.White };
+        //Glyph floorGlyph = new Glyph { c = '.', color = ColorHex.White };
+        //Glyph emptyGlyph = new Glyph { c = ' ', color = ColorHex.Black };
+        //emptyId = EntityManager.create();
+        //ENTITY.subscribe(emptyId, emptyGlyph, COMPONENT.GLYPH);
+        //wallId = EntityManager.create();
+        //ENTITY.subscribe(wallId, wallGlyph, COMPONENT.GLYPH);
+        //floorId = EntityManager.create();
+        //ENTITY.subscribe(floorId, floorGlyph, COMPONENT.GLYPH);
     }
     public IAI makeAI()
     {
@@ -51,7 +43,7 @@ public class Build : IBuild
     public IRegion makeLevel(IGame game, Vector3Int regionPos, bool addMobs = false)
     {
         IRegion map = makeMap(game, game.rng, regionPos);
-        //addMobsToRegion(game, map);
+        addMobsToRegion(game, map);
         return map;
     }
 
@@ -73,18 +65,22 @@ public class Build : IBuild
             for (int x = 0; x < map.dim.x; x++)
             {
                 Vector3Int posLocal = new Vector3Int(x, y, 0);
-                if (map.blocked(posLocal)) { continue; }
+                uint cellFlags = map.getCellFlags(posLocal);
+                if ( ENTITY.bitHas(cellFlags, (uint)(CELLFLAG.BLOCKED | CELLFLAG.CREATURE))) { continue; }
                 if (game.rng.pct(rate))
                 {
-                    Vector3Int posWorld = new Vector3Int(x + (map.dim.x * map.regionPos.x), y + (map.dim.y * map.regionPos.y), 0);
+                    Vector3Int posWorld = new Vector3Int(x + (map.dim.x * map.regionPos.x), y + (map.dim.y * map.regionPos.y), map.regionPos.z);
                     int roll = game.rng.rngC(1, MonData.entries.Length);
                     monsterentry entry = MonData.entries[roll];
-                    Creature c = new Creature(posWorld, MONTYPE.GetName(typeof(MONTYPE), entry.mid), new TermChar { c = entry.basechar, background = ColorHex.Black, foreground = entry.color}); ;
-                    c.baseAtkCost = entry.baseAtkSpeed;
-                    c.baseMoveCost = entry.baseMovSpeed;
-                    c.hp = entry.avg_hp;
-                    c.maxhp = entry.avg_hp;
-                    addNPC(c, map);
+
+                    //Glyph g = new Glyph { c = entry.basechar, color = entry.color };
+                    Position p = new Position { x = posWorld.x, y = posWorld.y, z = posWorld.z };
+                    //Creature c = new Creature { name = MONTYPE.GetName(typeof(MONTYPE), entry.mid), hpMax = entry.avg_hp, hp = entry.avg_hp, moveRate = entry.moveRate, attackRate = entry.attackRate, actionPoints = 0f };
+                    uint creatureId = EntityManager.create();
+                    ENTITY.subscribe(creatureId, entry.data, entry.components);
+                    ENTITY.subscribe(creatureId, p, COMPONENT.POSITION);
+
+                    addNPC(creatureId, map);
                 }
             }
         }
@@ -99,7 +95,7 @@ public class Build : IBuild
         //addNPC(creature, map);
     }
 
-    public void addNPC(Creature c, IRegion map)
+    public void addNPC(uint c, IRegion map)
     {
         map.addEntity(c);
     }
@@ -107,21 +103,17 @@ public class Build : IBuild
     public IRegion makeMap(IGame game, Rng rng, Vector3Int regionPos)
     {
         Vector2Int dim = Term.StockDim();
-        IRegion map = MapGen.test(game, regionPos, rng, defaultWall);
+        IRegion map = MapGen.test(game, regionPos, rng);
         return map;
     }
 
-    public Creature makePlayer()
-    {
-        return new Creature(new Vector3Int(0, 0, 0), "Player", new TermChar { c = '@', foreground = ColorHex.White, background = ColorHex.Black});
-    }
-
-    public uint makePlayer2()
+    public uint makePlayer()
     {
         Glyph g = new Glyph { c = '@', color = ColorHex.White };
         Position p = new Position { x = 0, y = 0, z = 0 };
+        Creature c = new Creature { name = "player", hpMax = 100, hp = 100, moveRate = 1f, attackRate = 1f, actionPoints = 0f };
         uint player = EntityManager.create();
-        ENTITY.subscribe(player, new object[2] { g, p}, new COMPONENT[2] { COMPONENT.GLYPH, COMPONENT.POSITION });
+        ENTITY.subscribe(player, new object[3] { g, p, c}, new COMPONENT[3] { COMPONENT.GLYPH, COMPONENT.POSITION, COMPONENT.CREATURE });
         return player;
     }
 
@@ -133,7 +125,6 @@ public class Build : IBuild
     public void enterFirstLevel0(IGame game)
     {
         World world = game.world;
-        world.addEntity(game.player, game);
         world.addEntity(game.playerId, game);
         //Vector3Int pos = new Vector3Int(40, 20, 0);
         //Creature creature = new Creature(pos, "Ant", new TermChar { c = 'a', background = ColorHex.Black, foreground = ColorHex.Red });

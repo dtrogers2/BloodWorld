@@ -17,9 +17,13 @@ public class GameScreen : BaseScreen
         if (game.log != null) { game.log.clearQueue(); }
         if (playerTurn(keyCode, stack, out float actionCost))
         {
-            game.player.actionCost += actionCost;
-            game.time += actionCost;
-            npcTurns(stack, actionCost);
+            if (ENTITY.has(game.playerId, COMPONENT.CREATURE))
+            {
+                Creature player = (Creature)ComponentManager.get(COMPONENT.CREATURE).data[game.playerId];
+                player.actionPoints -= actionCost;
+                game.time += Mathf.Abs(actionCost);
+                npcTurns(stack);
+            }
         }
     }
 

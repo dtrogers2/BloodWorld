@@ -17,13 +17,6 @@ public class World
         regions = new IRegion[worldDim.x, worldDim.y, worldDim.z];
     }
 
-    public IRegion playerRegion(IGame game)
-    {
-        IRegion r = null;
-        getRegion(game.player.position, game, out r);
-        return r;
-    }
-
     public bool getRegion(Vector3Int worldPos, IGame game, out IRegion r)
     {
         r = null;
@@ -70,20 +63,7 @@ public class World
         return rS;
     }
 
-    public bool getTile(Vector3Int worldPos, IGame game, out Tile tile)
-    {
-        tile = null;
-        Vector2Int stockTerm = Term.StockDim();
-        if (worldPos.x >= 0 && worldPos.x < worldDim.x * stockTerm.x && worldPos.y >= 0 && worldPos.y < worldDim.y * stockTerm.y && worldPos.z >= 0 && worldPos.z < worldDim.z)
-        {
-            if (getRegion(worldPos, game, out IRegion r))
-            {
-                tile = r.tile(worldPos);
-                return true;
-            }
-        }
-        return false;
-    }
+
 
 
     public bool getCellFlags(Vector3Int worldPos, IGame game, out uint cellBits)
@@ -134,34 +114,13 @@ public class World
         }
         return false;
     }
-    public bool moveEntity(Creature c, Vector3Int dest, IGame game)
-    {
-        if (getTile(dest, game, out Tile tile))
-        {
-            if (!tile.blocks())
-            {
-                if (removeEntity(c, game))
-                {
-                    c.position = dest;
-                    if (addEntity(c, game))
-                    {
-                        return true;
-                    } else
-                    {
-                        throw new System.Exception("Entity was removed but not added in moveEntity()!!!");
-                    }
-                }
-                return false;
-            }
-        }
-        return false;
-    }
+
 
     public bool moveEntity(uint c, Vector3Int dest, IGame game)
     {
         if (getCellFlags(dest, game, out uint cell))
         {
-            if (!ENTITY.bitHas(cell, (uint) CELLFLAG.BLOCKED))
+            if (!ENTITY.bitHas(cell, (uint) (CELLFLAG.BLOCKED | CELLFLAG.CREATURE)))
             {
                 if (removeEntity(c, game))
                 {
@@ -181,25 +140,6 @@ public class World
         return false;
     }
 
-    public bool removeEntity(Creature c, IGame game)
-    {
-        if (getRegion(c.position, game, out IRegion r))
-        {
-            r.removeEntity(c);
-            return true;
-        }
-        return false;
-    }
-
-    public bool addEntity(Creature c, IGame game)
-    {
-        if (getRegion(c.position, game, out IRegion r))
-        {
-            r.addEntity(c);
-            return true;
-        }
-        return false;
-    }
 
     public bool removeEntity(uint c, IGame game)
     {
@@ -243,72 +183,4 @@ public class World
         return new Vector3Int(Mathf.FloorToInt(position.x / regionDim.x), Mathf.FloorToInt(position.y / regionDim.y), position.z);
     }
 
-    public Tile getUnblockedGoal(IGame game, Tile center, Tile start)
-    {
-        int loopMax = 3;
-        bool found = false;
-        int xmin = center.position.x;
-        int xmax = center.position.x;
-        int ymin = center.position.y;
-        int ymax = center.position.y;
-        Tile newGoal = center;
-
-        do
-        {
-            for (int y = ymin; y <= ymax; y++)
-            {
-                for (int x = xmin; x <= xmax; x++)
-                {
-                    if (getTile(new Vector3Int(x, y), game, out Tile t))
-                    {
-                        if (!t.blocks())
-                        {
-
-                            if (!found)
-                            {
-                                newGoal = t;
-                                found = true;
-                            }
-                            if (found == true)
-                            {
-                                if ((t.distanceBetween(center) <= newGoal.distanceBetween(center)) && t.distanceBetween(start) <= newGoal.distanceBetween(start))
-                                {
-                                    newGoal = t;
-                                }
-                            }
-                        }
-                    } else
-                    {
-                        continue;
-                    }
-                    
-                }
-            }
-            if (xmin - 1 > 0) xmin--;
-            if (xmax + 1 < game.world.worldDim.x * Term.StockDim().x) xmax++;
-            if (ymin - 1 > 0) ymin--;
-            if (ymax + 1 < game.world.worldDim.x * Term.StockDim().y) ymax++;
-            loopMax--;
-            if (loopMax == 0) return null;
-        } while (found == false);
-        return newGoal;
-    }
-
-
-    public List<Tile> getNeighbors(IGame game, Vector3Int position)
-    {
-        List<Tile> retList = new List<Tile>();
-        for (int y = -1; y <= 1; y++)
-        {
-            for (int x = -1; x <= 1; x++)
-            {
-                if (y == 0 && x == 0) continue;
-                if (getTile(position + new Vector3Int(x, y, position.z), game, out Tile t))
-                {
-                    if (!t.blocks()) retList.Add(t);
-                }
-            }
-        }
-        return retList;
-    }
 }

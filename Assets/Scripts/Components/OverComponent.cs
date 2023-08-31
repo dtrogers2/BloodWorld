@@ -2,9 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Position
+public class Over
 {
-    public int x;
-    public int y;
-    public int z;
+    public uint entity;
 }

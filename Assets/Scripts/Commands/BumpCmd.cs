@@ -32,36 +32,18 @@ public class BumpCmd : CmdBase
         actionCost = 1.0f;
         Position p = (Position) ComponentManager.get(COMPONENT.POSITION).data[me];
         Vector3Int tgtPos = new Vector3Int(p.x + dir.x, p.y + dir.y, p.z + dir.z);
-        /*
-        if (game.world.getTile(tgtPos, game, out Tile tile))
+        // Search through nearby entities to see if there are valid targets to attack at target position
+
+        uint tgtId = 0;
+        bool tgtCreature = false;
+        if (game.world.getCellFlags(tgtPos, game, out uint flags))
         {
-            ICmd cmd = (tile.creature != null) ? new HitCmd(me, tile.creature, game) : new MoveCmd(dir, me, game);
-            return cmd.turn(out actionCost);
-        }*/
-
-            // Search through nearby entities to see if there are valid targets to attack at target position
-            List<uint> targets = new List<uint>();
-            Stack<IRegion> regions = game.world.getRegions(tgtPos, 0, game);
-            while (regions.Count > 0)
+            if (ENTITY.bitHas(flags, (uint)CELLFLAG.CREATURE))
             {
-                IRegion r = regions.Pop();
-                for (int i = 0; i < r.entities.Count; i++)
-                {
-                    uint eId = r.entities.ElementAt(i);
-                    if (ENTITY.has(eId, COMPONENT.POSITION))
-                    {
-                        Position otherP = (Position) ComponentManager.get(COMPONENT.POSITION).data[eId];
+                tgtCreature = game.world.getCellEntity(tgtPos, game, out tgtId);
+            }
 
-                        if (otherP.x == tgtPos.x && otherP.y == tgtPos.y)
-                        {
-                           targets.Add(eId);
-                        }
-                    }
-                    //if (!activeCreatures.Contains(r.creatureList[i]) && r.creatureList[i] != game.player) activeCreatures.Push(r.creatureList[i]);
-                }
-            
-            // Filter targets list for best target
-            ICmd cmd = (targets.Count > 0) ? new HitCmd(me, targets[0], game) : new MoveCmd(dir, me, game);
+            ICmd cmd = (tgtCreature) ? new HitCmd(me, tgtId, game) : new MoveCmd(dir, me, game);
             return cmd.turn(out actionCost);
         }
 

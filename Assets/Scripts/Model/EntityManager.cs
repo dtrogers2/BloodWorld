@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using Unity.VisualScripting.Antlr3.Runtime;
+using UnityEngine;
 
 public static class EntityManager
 {
@@ -32,7 +33,7 @@ public static class EntityManager
         {
             return reuse.Pop();
         }
-        return ++curLength;
+        return curLength++;
     }
 
     public static void reset()

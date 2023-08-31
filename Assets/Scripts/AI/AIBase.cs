@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using static UnityEditor.PlayerSettings;
 
 public class AIBase : IAI
 {
@@ -11,8 +12,9 @@ public class AIBase : IAI
         ICmd cmd;
         Vector3Int dir = Vector3Int.zero;
         Position p1 = (Position) ComponentManager.get(COMPONENT.POSITION).data[me];
-        Position p2 = (Position) ComponentManager.get(COMPONENT.POSITION).data[me];
+        Position p2 = (Position) ComponentManager.get(COMPONENT.POSITION).data[tgt];
         Vector3Int mePos = new Vector3Int(p1.x, p1.y, p1.z);
+        
         Vector3Int tgtPos = new Vector3Int(p2.x, p2.y, p2.z);
         float tgtDistance = Vector3Int.Distance(mePos, tgtPos);
         if (tgtDistance <= 10)
@@ -20,78 +22,103 @@ public class AIBase : IAI
             if (tgtDistance < 2)
             {
                 dir = new Vector3Int(Math.Sign(0f + tgtPos.x - mePos.x), Math.Sign(tgtPos.y - mePos.y), mePos.z);
+
+                if (ENTITY.has(me, COMPONENT.PATH)) ENTITY.unsubscribe(me, COMPONENT.PATH);
                 // Move directly to target
             }
             else if (tgtDistance >= 2)
             {
-                if (Visbility.canSee(tgtPos, mePos, game, false))
+                if (Visbility.lineTo(tgtPos, mePos, game, false))
                 {
                     // if it has unobstructed line, move directly towards target
                     dir = new Vector3Int(Math.Sign(0f + tgtPos.x - mePos.x), Math.Sign(tgtPos.y - mePos.y), mePos.z);
-
+                    if (ENTITY.has(me, COMPONENT.PATH)) ENTITY.unsubscribe(me, COMPONENT.PATH);
                 }
                 else
                 {
-                    dir = new Vector3Int(Math.Sign(0f + tgtPos.x - mePos.x), Math.Sign(tgtPos.y - mePos.y), mePos.z);
+                    //dir = new Vector3Int(Math.Sign(0f + tgtPos.x - mePos.x), Math.Sign(tgtPos.y - mePos.y), mePos.z);
                     // Obstructed line towards target, find a path to the target
-                    //pathNext(game, mePos, tgtPos, out dir);
+                    if (!ENTITY.has(me, COMPONENT.PATH))
+                    {
+                        Stack<Vector3Int> path = new Stack<Vector3Int>();
+                        if (pathNext(game, mePos, tgtPos, out path))
+                        {
+                            ENTITY.subscribe(me, new Path { path = path , gScore = path.Count - 1, pathTurns = 0}, COMPONENT.PATH);
+                        }
+                    } 
+
+                    if (ENTITY.has(me, COMPONENT.PATH))
+                    {
+                        Path p = (Path) ComponentManager.get(COMPONENT.PATH).data[me];
+                        if (p.path.Count > 0)
+                        {
+                            dir = p.path.Pop();
+                            Debug.Log($"hasPath dir: {dir}");
+                        }
+
+                        if (p.path.Count == 0) ENTITY.unsubscribe(me, COMPONENT.PATH);
+                    }
                 }
             }
-            cmd = new BumpCmd(new Vector3Int(dir.x, dir.y, 0), me, game);
+
+            if (dir != Vector3Int.zero)
+            {
+                cmd = new BumpCmd(new Vector3Int(dir.x, dir.y, 0), me, game);
+            } else
+            {
+                cmd = new WaitCmd(me, game);
+            }
+            
         } else
         {
             cmd = new WaitCmd(me, game);
         }
-       
+
+        if (ENTITY.has(me, COMPONENT.PATH))
+        {
+            Path p = (Path)ComponentManager.get(COMPONENT.PATH).data[me];
+            p.pathTurns++;
+            if (p.pathTurns >= p.gScore || p.gScore > Vector3Int.Distance(mePos, tgtPos))
+            {
+                ENTITY.unsubscribe(me, COMPONENT.PATH);
+            }
+        }
         return cmd.turn(out actionCost);
     }
 
-    public bool pathNext(IGame game, Vector3Int pos, Vector3Int tgt, out Vector3Int foundPath)
+    // Node positions are relative to the start position
+    public bool pathNext(IGame game, Vector3Int pos, Vector3Int tgt, out Stack<Vector3Int> foundPath)
     {
         int searchMax = 100;
-        foundPath = Vector3Int.zero;
-        World world = game.world;
-        List<Tile> open = new List<Tile>();
-        List<Tile> closed = new List<Tile>();
-        Tile start;
-        Tile oDest;
-        if (world.getTile(pos, game, out start) && world.getTile(tgt, game, out oDest))
-        {
-            if (!start.traversable() || !oDest.traversable()) { return false; }
-        }  else
-        {
-            return false;
-        }
+        foundPath = new Stack<Vector3Int>();
+        Node[,] nodes = Node.getNodes(game, pos);
+        List<Node> open = new List<Node>();
+        List<Node> closed = new List<Node>();
+        // Vector3Int oCenter = new Vector3Int(Mathf.Abs(pos.x - Node.dim.x / 2), Mathf.Abs(pos.y - Node.dim.y / 2), pos.z);
+        Node start = nodes[Node.dim.x / 2, Node.dim.y / 2];
+        Node oDest = nodes[Node.dim.x / 2 + (tgt - pos).x, Node.dim.y / 2 + (tgt - pos).y];
+        if (!start.traversable() || !oDest.traversable()) { Debug.Log("start or end not traversible"); return false; }
         start.resetNode();
         oDest.resetNode();
-        Tile current = start;
-        Tile goal = oDest;
-        Tile initGoal = goal;
+        Node current = start;
+        Node goal = oDest;
+        Node initGoal = goal;
         
 
         current.gScore = 0;
         current.hScore = start.distanceBetween(goal);
         open.Add(start);
-        Tile same = null;
+        Node same = null;
         // If the starting position is the closest to the goal without having to move, don't move;
-        if (current == goal) {current.resetNode();goal.resetNode(); return false; }
+        if (current == goal) {Debug.Log($"Already at goal"); return false; }
         // The open set ocntains unevaluated paths to the goal
         while (open.Count > 0)
         {
-            if (goal.blocks()) goal = world.getUnblockedGoal(game, initGoal, start);
+            if (goal.blocks()) goal = Node.getUnblockedGoal(nodes, initGoal, start);
             searchMax--;
             if (searchMax == 0 || goal == null)
             {
-                foreach (Tile t in closed)
-                {
-                    t.resetNode();
-                }
-
-                foreach (Tile t in open)
-                {
-                    t.resetNode();
-                }
-                current.resetNode();
+                //Debug.Log($"Searched too many spaces ({searchMax}) or goal is {goal}. Open count: {open.Count}");
                 return false;
             }
             //If the goal position is blocked, it creates a new goal position closest to the original goal position
@@ -99,7 +126,7 @@ public class AIBase : IAI
             if (current != goal)
             {
                 //This selects the node position in the open set closest to the goal that requires the fewest moves to get there
-                foreach (Tile node in open)
+                foreach (Node node in open)
                 {
                     if ((node.gScore + node.hScore < current.gScore + current.hScore))
                     {
@@ -115,23 +142,14 @@ public class AIBase : IAI
             //If a path is found, it returns the list of moves it takes to get to the goal position
             if (current == goal)
             {
-                Vector3Int[] path = new Vector3Int[current.gScore + 1];
+                //Vector3Int[] path = new Vector3Int[current.gScore + 1];
                 int counter = current.gScore;
                 while (counter > 0)
                 {
-                    path[counter - 1] = current.position;
+                    //path[counter - 1] = current.position;
+                    foundPath.Push(new Vector3Int(Sign(current.position.x), Sign(current.position.y)));
                     current = current.nodeParent;
                     counter--;
-                }
-                foundPath = path[0] - start.position;
-                foreach (Tile t in closed)
-                {
-                    t.resetNode();
-                }
-
-                foreach (Tile t in open)
-                {
-                    t.resetNode();
                 }
                 return true;
             }
@@ -140,10 +158,10 @@ public class AIBase : IAI
             closed.Add(current);
 
             //Gets the node positions that are next to the current node
-            List<Tile> neighbors = world.getNeighbors(game, current.position);
+            List<Node> neighbors = current.getNeighbors(nodes);
 
             bool changeGoal = false;
-            foreach (Tile neighbor in neighbors)
+            foreach (Node neighbor in neighbors)
             {
                 // Possibly redundant, neighbors no longer contains blocked tiles
                 /* if (neighbor.blocks())
@@ -178,13 +196,12 @@ public class AIBase : IAI
             }
             if (!changeGoal) same = current;
         }
-        // Cleanup tiles nodes
-        foreach (Tile t in closed)
-        {
-            Debug.Log(t.position);
-            t.resetNode();
-        }
         return false;
 
+    }
+
+    public static int Sign(int n)
+    {
+        return n < 0 ? -1 : (n > 0 ? 1 : 0);
     }
 }

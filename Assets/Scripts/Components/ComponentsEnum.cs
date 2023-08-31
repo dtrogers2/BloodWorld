@@ -9,4 +9,6 @@ public enum COMPONENT
     POSITION = 1 << 1,
     GLYPH = 1 << 2,
     CREATURE = 1 << 3,
+    OVER = 1 << 4,
+    PATH = 1 << 5,
 }

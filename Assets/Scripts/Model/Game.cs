@@ -6,7 +6,6 @@ using UnityEngine.UIElements;
 public interface IGame
 {
     public Rng rng { get; set; }
-    public Creature player { get; set; }
     public uint playerId { get; set; }
     public IAI ai { get; set; }
     public void msg(string s);
@@ -24,7 +23,6 @@ public interface IGame
 public class Game : IGame
 {
     public Rng rng { get ; set ; }
-    public Creature player { get; set; }
     public uint playerId { get; set; }
     public MsgLog log { get; set; } = new MsgLog();
     public float time { get; set; } = 0f;
@@ -33,10 +31,9 @@ public class Game : IGame
     public IAI ai { get; set; }
     public IBuild build { get ; set ; }
 
-    public Game(Rng rng, Creature player, uint playerId, IBuild build)
+    public Game(Rng rng,uint playerId, IBuild build)
     {
         this.rng = rng;
-        this.player = player;
         this.playerId = playerId;
         this.build = build;
 

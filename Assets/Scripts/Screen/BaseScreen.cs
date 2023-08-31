@@ -17,14 +17,19 @@ public class BaseScreen : IScreen
 
     virtual public void draw(ITerm term)
     {
-        Position p = (Position) ComponentManager.get(COMPONENT.POSITION).data[game.playerId];
-        Vector3Int pos = new Vector3Int(p.x, p.y, p.z);
-        DrawScreen.drawMapPlayer(term, pos, game);
-        DrawScreen.renderHUD(term, game);
-        DrawScreen.renderMsgs(term, game);
+        Vector3Int pos = Vector3Int.zero;
+        if (ENTITY.has(game.playerId, COMPONENT.POSITION))
+        {
+            Position p = (Position)ComponentManager.get(COMPONENT.POSITION).data[game.playerId];
+            pos = new Vector3Int(p.x, p.y, p.z);
+            DrawScreen.drawMapPlayer(term, pos, game);
+            DrawScreen.renderHUD(term, game);
+            DrawScreen.renderMsgs(term, game);
+        }
+
     }
 
-    public void npcTurns(IStack stack, float actionCost)
+    public void npcTurns(IStack stack)
     {
         Position p = (Position) ComponentManager.get(COMPONENT.POSITION).data[game.playerId];
         Vector3Int pos = new Vector3Int(p.x, p.y, p.z);
@@ -41,6 +46,7 @@ public class BaseScreen : IScreen
         for (int i = activeCreatures.Count; i > 0; i--)
         {
             //insert logic to find nearest active creature it cares about
+
             npcTurn(activeCreatures.Pop(), game.playerId);
         }
         handleMsgs(stack);
@@ -48,18 +54,28 @@ public class BaseScreen : IScreen
     }
     public void npcTurn(uint me, uint tgt)
     {
-        
-        //me.actionCost -= tgt.actionCost;
-        IAI ai = game.ai;
-        if (ai != null /*&& me.actionCost <= 0*/) 
+        float playerCost = 0f;
+        if (ENTITY.has(game.playerId, COMPONENT.CREATURE))
         {
-           // while (me.actionCost <= 0)
-            //{
-                float newCost = 0.0f;
-                ai.turn(me, tgt, game, out newCost);
-            //    me.actionCost += newCost;
-            //}
+            Creature c = (Creature)ComponentManager.get(COMPONENT.CREATURE).data[game.playerId];
+            playerCost = c.actionPoints;
         }
+        if (ENTITY.has(me, COMPONENT.CREATURE))
+        {
+            Creature c = (Creature)ComponentManager.get(COMPONENT.CREATURE).data[me];
+            c.actionPoints += -playerCost;
+            IAI ai = game.ai;
+            if (ai != null && c.actionPoints > 0)
+            {
+                while (c.actionPoints > 0)
+                {
+                    float newCost = 0.0f;
+                    ai.turn(me, tgt, game, out newCost);
+                    c.actionPoints -= newCost;
+                }
+            }
+        }
+
     }
 
     public void finishTurn(Creature c)
@@ -69,7 +85,11 @@ public class BaseScreen : IScreen
 
     public void finishPlayerTurn()
     {
-        game.player.actionCost = 0f;
+        if (ENTITY.has(game.playerId, COMPONENT.CREATURE))
+        {
+            Creature c = (Creature)ComponentManager.get(COMPONENT.CREATURE).data[game.playerId];
+            c.actionPoints = 0f;
+        }
     }
     public void handleMsgs(IStack s)
     {
@@ -82,7 +102,7 @@ public class BaseScreen : IScreen
 
     public bool over(IStack s)
     {
-        bool over = !game.player.alive();
+        bool over = false; //!game.player.alive();
         if (over)
         {
             s.pop();

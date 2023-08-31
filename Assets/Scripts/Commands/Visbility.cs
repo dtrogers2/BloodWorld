@@ -4,23 +4,20 @@ using UnityEngine;
 
 public class Visbility
 {
-    public static bool canSee(Vector3Int a, Vector3Int b, IGame game, bool onlyEnv = false)
+    public static bool lineTo(Vector3Int a, Vector3Int b, IGame game, bool visionOnly = false)
     {
         BresIter i = BresIter.bresIter(a, b);
         for (;!i.done();)
         {
             Vector2Int p = i.next();
-            if (game.world.getTile((Vector3Int) p, game, out Tile t))
+            if (game.world.getCellFlags((Vector3Int) p, game, out uint cellFlags))
             {
-                if (t.position == a || t.position == b) { continue; }
-                if (onlyEnv)
-                {
-                    if (!t.traversable()) return false;
-                } else
-                {
-                    if (t.blocks()) return false;
-                }
-               
+                if ((p.x == a.x && p.y == a.y) || (p.x == b.x && p.y == b.y)) continue;
+                if (visionOnly && ENTITY.bitHas(cellFlags, (uint)(CELLFLAG.OPAQUE))) return false;
+                else if (ENTITY.bitHas(cellFlags, (uint)(CELLFLAG.OPAQUE | CELLFLAG.BLOCKED | CELLFLAG.CREATURE))) return false;
+            } else
+            {
+                return false;
             }
         }
         return true;

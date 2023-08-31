@@ -1,31 +1,22 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEngine.EventSystems.EventTrigger;
 
 
 public class MonData
 {
     public static monsterentry[] entries = new monsterentry[]
     {
-        new monsterentry { mid = MONTYPE.ERROR, basechar = 'E', color = ColorHex.Red,
-            HD = 0, avg_hp = 0, AC = 0, EV = 0, REF = 0, WIL = 0, FOR = 0, LUK = 0,baseMovSpeed = 1, baseAtkSpeed = 1,
-            faction = FacType.HUMANS,
-            parts = PartDataUtils.HUMANPARTS(),
+        new monsterentry { mid = MONTYPE.ERROR, data = new object[2] {new Glyph { c = 'E', color = ColorHex.Red },
+            new Creature { name = "Error", actionPoints = 0f, attackRate = 1f, moveRate = 1f, hp = 1, hpMax = 1 } }
+            , components = new COMPONENT[2] {COMPONENT.GLYPH, COMPONENT.CREATURE}
         },
-        new monsterentry { mid = MONTYPE.HUMAN, basechar = 'h', color = ColorHex.White,
-            HD = 1, avg_hp = 10, AC = 0, EV = 0, REF = 0, WIL = 0, FOR = 0, LUK = 0,baseMovSpeed = 1, baseAtkSpeed = 1,
-            faction = FacType.HUMANS,
-            parts = PartDataUtils.HUMANPARTS(),
+        new monsterentry { mid = MONTYPE.HUMAN, data = new object[2] {new Glyph { c = 'h', color = ColorHex.White }, new Creature { name = "Human", actionPoints = 0f, attackRate = 1f, moveRate = 1f, hp = 3, hpMax = 3 } }, components = new COMPONENT[2] {COMPONENT.GLYPH, COMPONENT.CREATURE}
         },
-        new monsterentry { mid = MONTYPE.BAT, basechar = 'b', color = ColorHex.GrayDark,
-            HD = 1, avg_hp = 10, AC = 0, EV = 0, REF = 0, WIL = 0, FOR = 0, LUK = 0,baseMovSpeed = 0.5f, baseAtkSpeed = 1,
-            faction = FacType.PREDATORS,
-            parts = PartDataUtils.FLYERPARTS(),
+        new monsterentry { mid = MONTYPE.BAT, data = new object[2] {new Glyph { c = 'b', color = ColorHex.GrayDark }, new Creature { name = "Bat", actionPoints = 0f, attackRate = 1f, moveRate = 0.5f, hp = 2, hpMax = 2 } }, components = new COMPONENT[2] {COMPONENT.GLYPH, COMPONENT.CREATURE}
         },
-        new monsterentry { mid = MONTYPE.RAT, basechar = 'r', color = ColorHex.BlueDark,
-            HD = 1, avg_hp = 10, AC = 0, EV = 0, REF = 0, WIL = 0, FOR = 0, LUK = 0,baseMovSpeed = 1f, baseAtkSpeed = 1,
-            faction = FacType.PREDATORS,
-            parts = PartDataUtils.QUADRAPED(),
+        new monsterentry { mid = MONTYPE.RAT, data = new object[2] {new Glyph { c = 'r', color = ColorHex.BlueDark }, new Creature { name = "Rat", actionPoints = 0f, attackRate = 1f, moveRate = 1f, hp = 1, hpMax = 1 } }, components = new COMPONENT[2] {COMPONENT.GLYPH, COMPONENT.CREATURE}
         },
 
     };
@@ -45,26 +36,6 @@ public class MonData
 public struct monsterentry
 {
     public MONTYPE mid;
-    public char basechar;
-    public string color;
-    // monster flags
-    // resists
-    public FacType faction;
-    public int HD;
-    public int avg_hp;
-    public short AC;
-    public short EV;
-    public short REF;
-    public short WIL;
-    public short FOR;
-    public short LUK;
-    public float baseMovSpeed;
-    public float baseAtkSpeed;
-    //public short aggression;
-    //item[] inventory
-    public PartData[] parts;
-    //MUTTYPE[] mutations
-    //SPELLTYPE[] spells;
-    //itemusetype
-    
+    public object[] data;
+    public COMPONENT[] components;
 }
