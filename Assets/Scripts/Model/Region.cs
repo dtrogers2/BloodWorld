@@ -104,8 +104,8 @@ public class Region : IRegion
             uint otherId = getCellEntity(pos);
             if (otherId != eId && otherId != 0)
             {
-                Over o = new Over { entity = otherId };
-                ENTITY.subscribe(eId, o, COMPONENT.OVER);
+                CellStack o = new CellStack { entity = otherId };
+                ENTITY.subscribe(eId, o, COMPONENT.CELLSTACK);
             }
             setCellEntity(eId, pos);
 
@@ -127,11 +127,11 @@ public class Region : IRegion
             if (getCellEntity(pos) == eId)
             {
                 removeCellEntity(new Vector3Int(p.x, p.y, p.z));
-                if (ENTITY.has(eId, COMPONENT.OVER)) // If an entity was over something, add it back to the cell
+                if (ENTITY.has(eId, COMPONENT.CELLSTACK)) // If an entity was over something, add it back to the cell
                 {
-                    Over o = (Over) ComponentManager.get(COMPONENT.OVER).data[eId];
+                    CellStack o = (CellStack) ComponentManager.get(COMPONENT.CELLSTACK).data[eId];
                     setCellEntity(o.entity, pos);
-                    ENTITY.unsubscribe(eId, COMPONENT.OVER);
+                    ENTITY.unsubscribe(eId, COMPONENT.CELLSTACK);
                 }
             }
 

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,7 +41,7 @@ public class BaseScreen : IScreen
             IRegion r = regions.Pop();
             for (int i = 0; i < r.entities.Count; i++)
             {
-                if (r.entities.ElementAt(i) != game.playerId && !activeCreatures.Contains(r.entities.ElementAt(i))) activeCreatures.Push(r.entities.ElementAt(i));
+                if (r.entities.ElementAt(i) != game.playerId && !activeCreatures.Contains(r.entities.ElementAt(i)) && ENTITY.has(r.entities.ElementAt(i), COMPONENT.CREATURE)) activeCreatures.Push(r.entities.ElementAt(i));
             }
         }
         for (int i = activeCreatures.Count; i > 0; i--)
@@ -85,11 +86,39 @@ public class BaseScreen : IScreen
 
     public void finishPlayerTurn()
     {
+
         if (ENTITY.has(game.playerId, COMPONENT.CREATURE))
         {
             Creature c = (Creature)ComponentManager.get(COMPONENT.CREATURE).data[game.playerId];
+
+            for (int stainCount = ComponentManager.get(COMPONENT.STAIN).entities.Count - 1; stainCount > 0; stainCount--)
+            {
+                uint stainId = ComponentManager.get(COMPONENT.STAIN).entities[stainCount];
+                if (!Env.isEnv(stainId))
+                {
+                    
+                    Stain s = (Stain)ComponentManager.get(COMPONENT.STAIN).data[stainId];
+                    s.amount += c.actionPoints;
+
+                    if (s.amount <= 0)
+                    {
+                        ENTITY.unsubscribe(stainId, COMPONENT.STAIN);
+                        uint flags = ENTITY.get(stainId);
+
+                        if (ENTITY.bitIs(flags, (uint) (COMPONENT.GLYPH | COMPONENT.POSITION | COMPONENT.CELLSTACK))) // If stain was just a stain entity, recycle it
+                        {
+                            game.world.removeEntity(stainId, game);
+                            ENTITY.unsubscribe(stainId, new COMPONENT[2] { COMPONENT.GLYPH, COMPONENT.POSITION});
+                            
+                        }
+                    }
+                }
+            }
+
             c.actionPoints = 0f;
         }
+
+
     }
     public void handleMsgs(IStack s)
     {

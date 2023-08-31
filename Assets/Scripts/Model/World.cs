@@ -63,6 +63,34 @@ public class World
         return rS;
     }
 
+    public bool getCellStack(Vector3Int position, IGame game, out Stack<uint> stack)
+    {
+        stack = new Stack<uint>();
+        if (getCellEntity(position, game, out uint cellEty))
+        {
+            if (ENTITY.has(cellEty, COMPONENT.CELLSTACK))
+            {
+                CellStack cMain = (CellStack) ComponentManager.get(COMPONENT.CELLSTACK).data[cellEty];
+                uint subC = cMain.entity;
+                stack.Push(subC);
+                bool hasStack = true;
+                while (hasStack)
+                {
+                    if (ENTITY.has(subC, COMPONENT.CELLSTACK))
+                    {
+                        CellStack c2 = (CellStack)ComponentManager.get(COMPONENT.CELLSTACK).data[subC];
+                        subC = c2.entity;
+                        stack.Push(subC);
+                    } else
+                    {
+                        hasStack = false;
+                    }
+                }
+                return true;
+            }
+        }
+        return false;
+    }
 
 
 
@@ -164,6 +192,7 @@ public class World
             Position p = (Position) ComponentManager.get(COMPONENT.POSITION).data[c];
             if (getRegion(new Vector3Int(p.x, p.y, p.z), game, out IRegion r))
                 {
+                    // get Cell stack for new position and do logic, such as apply stains
                     r.addEntity(c);
                     return true;
                 }

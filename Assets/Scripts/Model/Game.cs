@@ -26,7 +26,7 @@ public class Game : IGame
     public uint playerId { get; set; }
     public MsgLog log { get; set; } = new MsgLog();
     public float time { get; set; } = 0f;
-    public World world { get; set; } = new World(new Vector3Int(1, 1, 1));
+    public World world { get; set; } = new World(new Vector3Int(3, 3, 1));
 
     public IAI ai { get; set; }
     public IBuild build { get ; set ; }

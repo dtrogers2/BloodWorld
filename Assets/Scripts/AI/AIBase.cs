@@ -1,9 +1,11 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 using static UnityEditor.PlayerSettings;
+using static UnityEngine.RuleTile.TilingRuleOutput;
 
 public class AIBase : IAI
 {
@@ -22,25 +24,28 @@ public class AIBase : IAI
             if (tgtDistance < 2)
             {
                 dir = new Vector3Int(Math.Sign(0f + tgtPos.x - mePos.x), Math.Sign(tgtPos.y - mePos.y), mePos.z);
-
-                if (ENTITY.has(me, COMPONENT.PATH)) ENTITY.unsubscribe(me, COMPONENT.PATH);
                 // Move directly to target
             }
             else if (tgtDistance >= 2)
             {
-                if (Visbility.lineTo(tgtPos, mePos, game, false))
+                if (Visbility.lineTo(mePos, tgtPos, game, false))
                 {
                     // if it has unobstructed line, move directly towards target
                     dir = new Vector3Int(Math.Sign(0f + tgtPos.x - mePos.x), Math.Sign(tgtPos.y - mePos.y), mePos.z);
-                    if (ENTITY.has(me, COMPONENT.PATH)) ENTITY.unsubscribe(me, COMPONENT.PATH);
                 }
                 else
                 {
+                    Stack<Vector3Int> path = new Stack<Vector3Int>();
+                    if (pathNext(game, mePos, tgtPos, out path))
+                    {
+                        dir = path.Pop();
+                    }
                     //dir = new Vector3Int(Math.Sign(0f + tgtPos.x - mePos.x), Math.Sign(tgtPos.y - mePos.y), mePos.z);
                     // Obstructed line towards target, find a path to the target
+                    /*
                     if (!ENTITY.has(me, COMPONENT.PATH))
                     {
-                        Stack<Vector3Int> path = new Stack<Vector3Int>();
+                        
                         if (pathNext(game, mePos, tgtPos, out path))
                         {
                             ENTITY.subscribe(me, new Path { path = path , gScore = path.Count - 1, pathTurns = 0}, COMPONENT.PATH);
@@ -50,14 +55,29 @@ public class AIBase : IAI
                     if (ENTITY.has(me, COMPONENT.PATH))
                     {
                         Path p = (Path) ComponentManager.get(COMPONENT.PATH).data[me];
+                        if (p.pathTurns > 3)
+                        {
+                            if (pathNext(game, mePos, tgtPos, out path))
+                            {
+                                p.path = path;
+                                p.gScore = path.Count - 1;
+                                p.pathTurns = 0;
+                            }
+                        }
                         if (p.path.Count > 0)
                         {
-                            dir = p.path.Pop();
-                            Debug.Log($"hasPath dir: {dir}");
+                           dir = p.path.Pop();
+                            if (game.world.getCellFlags(mePos + dir, game, out uint cellBits)) {
+                                if (ENTITY.bitHas(cellBits, ((uint) CELLFLAG.BLOCKED)))
+                                {
+                                    bool newDir = game.rng.oneIn(1);
+                                    if (newDir) { dir.x = 0; } else { dir.y = 0; }
+                                }
+                            }
                         }
 
                         if (p.path.Count == 0) ENTITY.unsubscribe(me, COMPONENT.PATH);
-                    }
+                    }*/
                 }
             }
 
@@ -73,7 +93,7 @@ public class AIBase : IAI
         {
             cmd = new WaitCmd(me, game);
         }
-
+        /*
         if (ENTITY.has(me, COMPONENT.PATH))
         {
             Path p = (Path)ComponentManager.get(COMPONENT.PATH).data[me];
@@ -82,33 +102,64 @@ public class AIBase : IAI
             {
                 ENTITY.unsubscribe(me, COMPONENT.PATH);
             }
-        }
+        }*/
         return cmd.turn(out actionCost);
     }
 
     // Node positions are relative to the start position
     public bool pathNext(IGame game, Vector3Int pos, Vector3Int tgt, out Stack<Vector3Int> foundPath)
     {
-        int searchMax = 100;
+        //int searchMax = 100;
         foundPath = new Stack<Vector3Int>();
         Node[,] nodes = Node.getNodes(game, pos);
         List<Node> open = new List<Node>();
-        List<Node> closed = new List<Node>();
+        HashSet<Node> closed = new HashSet<Node>();
         // Vector3Int oCenter = new Vector3Int(Mathf.Abs(pos.x - Node.dim.x / 2), Mathf.Abs(pos.y - Node.dim.y / 2), pos.z);
         Node start = nodes[Node.dim.x / 2, Node.dim.y / 2];
-        Node oDest = nodes[Node.dim.x / 2 + (tgt - pos).x, Node.dim.y / 2 + (tgt - pos).y];
-        if (!start.traversable() || !oDest.traversable()) { Debug.Log("start or end not traversible"); return false; }
-        start.resetNode();
-        oDest.resetNode();
-        Node current = start;
-        Node goal = oDest;
-        Node initGoal = goal;
-        
-
-        current.gScore = 0;
-        current.hScore = start.distanceBetween(goal);
+        Node goal = nodes[Node.dim.x / 2 + (tgt - pos).x, Node.dim.y / 2 + (tgt - pos).y];
+        // if (!start.traversable() || !oDest.traversable()) { Debug.Log("start or end not traversible"); return false; }
         open.Add(start);
-        Node same = null;
+
+        while (open.Count > 0)
+        {
+            Node current = open[0];
+            for (int i = 0; i < open.Count; i++)
+            {
+                if (open[i].getF() < current.getF() || open[i].getF() == current.getF()) 
+                {
+                    if (open[i].hScore < current.hScore)
+                    current = open[i];
+                }
+
+            }
+            open.Remove(current);
+            closed.Add(current);
+
+            if (current == goal)
+            {
+                while (current.nodeParent != null)
+                {
+                    foundPath.Push(current.position);
+                    current = current.nodeParent;
+                }
+                return true;
+            }
+
+            foreach (Node neighbor in current.getNeighbors(nodes))
+            {
+                if (closed.Contains(neighbor) || !neighbor.traversable()) continue;
+                int newCost = current.gScore + current.distanceBetween(neighbor);
+                if (!open.Contains(neighbor) || newCost < neighbor.gScore)
+                {
+                    neighbor.gScore = newCost;
+                    neighbor.hScore = neighbor.distanceBetween(goal);
+                    neighbor.nodeParent = current;
+                    if (!open.Contains(neighbor)) open.Add(neighbor);
+                }
+            }
+        }
+        //Node same = null;
+        /*
         // If the starting position is the closest to the goal without having to move, don't move;
         if (current == goal) {Debug.Log($"Already at goal"); return false; }
         // The open set ocntains unevaluated paths to the goal
@@ -147,7 +198,9 @@ public class AIBase : IAI
                 while (counter > 0)
                 {
                     //path[counter - 1] = current.position;
-                    foundPath.Push(new Vector3Int(Sign(current.position.x), Sign(current.position.y)));
+                    Vector3Int s = new Vector3Int(Sign(current.position.x), Sign(current.position.y));
+                    if (s != Vector3Int.zero) foundPath.Push(s);
+                    Debug.Log($"path[{counter}]:{current.position}");
                     current = current.nodeParent;
                     counter--;
                 }
@@ -164,11 +217,6 @@ public class AIBase : IAI
             foreach (Node neighbor in neighbors)
             {
                 // Possibly redundant, neighbors no longer contains blocked tiles
-                /* if (neighbor.blocks())
-                {
-                    closed.Add(neighbor);
-                    continue;
-                }*/
                 //keeps the old g score temporarily
                 //checks if the updated gscore is better than the old one
                 if (neighbor.visited)
@@ -195,7 +243,7 @@ public class AIBase : IAI
                 neighbor.visited = true;
             }
             if (!changeGoal) same = current;
-        }
+        }*/
         return false;
 
     }

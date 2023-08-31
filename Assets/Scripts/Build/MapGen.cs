@@ -94,55 +94,6 @@ public class MapGen
                      
                     default: break;
                 }
-                /*
-                bool noDiag = true;
-                if (ENTITY.bitHas(dirFlags, (uint)(DIR.NORTH | DIR.SOUTH | DIR.WEST | DIR.EAST))
-                    && (ENTITY.bitHas(dirFlags, (uint)DIR.NORTHWEST) || ENTITY.bitHas(dirFlags, (uint)DIR.NORTHEAST)
-                    || ENTITY.bitHas(dirFlags, (uint)DIR.SOUTHEAST) || ENTITY.bitHas(dirFlags, (uint)DIR.SOUTHWEST)))
-                noDiag = false;*/
-               // switch(dirFlags) {
-                //    case unchecked((uint)DIR.NORTH | (uint) DIR.SOUTH):
-                //    case  unchecked((~((uint)DIR.WEST ^ (uint)DIR.EAST) & ((uint)DIR.NORTH | (uint)DIR.SOUTH)) | ((uint) DIR.NORTH ^ (uint) DIR.SOUTH)): map.setCellEntity(Env.get(ENV.WALL_WE), new Vector3Int(x, y)); break;
-                //    default: break;
-                //}
-
-
-                /*
-                if (ENTITY.bitHas(dirFlags, (uint) (DIR.NORTH | DIR.SOUTH)) && !ENTITY.bitHas(dirFlags, (uint)(DIR.WEST | DIR.EAST)))
-                {
-                    map.setCellEntity(Env.get(ENV.WALL_WE), new Vector3Int(x, y));
-                    continue;
-                }
-
-                if (ENTITY.bitHas(dirFlags, (uint)(DIR.WEST | DIR.EAST)) && !ENTITY.bitHas(dirFlags, (uint)(DIR.NORTH | DIR.SOUTH)))
-                {
-                    map.setCellEntity(Env.get(ENV.WALL_NS), new Vector3Int(x, y));
-                    continue;
-                }
-
-                if (ENTITY.bitHas(dirFlags, (uint)(DIR.NORTH | DIR.WEST)) && !ENTITY.bitHas(dirFlags, (uint)(DIR.EAST | DIR.SOUTH)))
-                {
-                    map.setCellEntity(Env.get(ENV.WALL_SE), new Vector3Int(x, y));
-                    continue;
-                }
-
-                if (ENTITY.bitHas(dirFlags, (uint)(DIR.NORTH | DIR.EAST)) && !ENTITY.bitHas(dirFlags, (uint)(DIR.WEST | DIR.SOUTH)))
-                {
-                    map.setCellEntity(Env.get(ENV.WALL_SW), new Vector3Int(x, y));
-                    continue;
-                }
-
-                if (ENTITY.bitHas(dirFlags, (uint)(DIR.SOUTH | DIR.WEST)) && !ENTITY.bitHas(dirFlags, (uint)(DIR.NORTH | DIR.EAST)))
-                {
-                    map.setCellEntity(Env.get(ENV.WALL_NE), new Vector3Int(x, y));
-                    continue;
-                }
-
-                if (ENTITY.bitHas(dirFlags, (uint)(DIR.SOUTH | DIR.EAST)) && !ENTITY.bitHas(dirFlags, (uint)(DIR.NORTH | DIR.WEST)))
-                {
-                    map.setCellEntity(Env.get(ENV.WALL_NW), new Vector3Int(x, y));
-                    continue;
-                }*/
 
             }
         }
@@ -172,6 +123,7 @@ public class MapGen
         int y2 = XT.y - 1;
         List<Vector3Int> seconds = new List<Vector3Int>();
         Vector3Int p = new Vector3Int();
+        bool isWater = rng.pct(25);
         for (int y = 0; y <= XT.y; y++)
         {
             p.y = y + UL.y;
@@ -184,12 +136,20 @@ public class MapGen
                 map.setCellEntity(Env.get(ENV.FLOOR), p);
                 map.delCellFlags(CELLFLAG.BLOCKED | CELLFLAG.OPAQUE, p);
 
-                if (!edge && (secs || filled))
+                if ((!edge && (secs || filled)) || (isWater && filled))
                 {
-                    map.setCellFlags(CELLFLAG.BLOCKED | CELLFLAG.OPAQUE, p);
-                    map.setCellEntity(Env.get(ENV.WALL), p);
+                    if (isWater && filled)
+                    {
+                        map.setCellEntity(Env.get(ENV.WATER), p);
+
+                    } else
+                    {
+                        map.setCellFlags(CELLFLAG.BLOCKED | CELLFLAG.OPAQUE, p);
+                        map.setCellEntity(Env.get(ENV.WALL), p);
+                    }
+
                 }
-                if (edge) seconds.Add(p);
+                if (edge && !(isWater && filled)) seconds.Add(p);
             }
         }
         if (!filled) makeDoors(map, seconds);
@@ -202,7 +162,6 @@ public class MapGen
             int ix = rng.rng(0, edges.Count);
             if (ix < edges.Count)
             {
-                //map.removeCellEntity(edges[ix]);
                 map.delCellFlags(CELLFLAG.BLOCKED | CELLFLAG.OPAQUE, edges[ix]);
                 map.setCellEntity(Env.get(ENV.FLOOR), edges[ix]);
             }

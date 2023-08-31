@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using Unity.VisualScripting.Antlr3.Runtime;
 using UnityEngine;
+using UnityEngine.Timeline;
 
 public static class EntityManager
 {
@@ -79,7 +80,11 @@ public struct ENTITY
         {
             unsubscribe(id, components[i]);
         }
-        if (EntityManager.entities[id] == (uint) COMPONENT.NONE) EntityManager.clear(id);
+    }
+
+    public static uint get(uint id)
+    {
+        return EntityManager.get(id);
     }
 
 
@@ -103,6 +108,12 @@ public struct ENTITY
     public static bool bitHas(uint src, uint set)
     {
         return (src & set) >= 1;
+    }
+
+    public static bool bitIs(uint src, uint set)
+    {
+        uint mask = ~src;
+        return ~(set ^ mask) == 0;
     }
 
     public static uint bitSet(uint src, uint set)

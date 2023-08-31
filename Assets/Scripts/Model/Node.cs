@@ -36,18 +36,25 @@ public class Node : IComparer
         return nodes;
     }
 
+    public int getF()
+    {
+        return gScore + hScore;
+    }
 
     public Node(Vector3Int position)
     {
+        cellFlags = 0;
+        gScore = int.MaxValue;
+        hScore = int.MaxValue;
         this.position = position;
-        resetNode();
     }
 
     public Node(Vector3Int position, uint flags)
     {
+        gScore = int.MaxValue;
+        hScore = int.MaxValue;
         this.position = position;
         cellFlags = flags;
-        resetNode();
     }
 
     public bool blocks()
@@ -94,13 +101,6 @@ public class Node : IComparer
         else return 0;
     }
 
-    public void resetNode()
-    {
-        gScore = int.MaxValue;
-        hScore = int.MaxValue;
-        nodeParent = this;
-        visited = false;
-    }
     public static bool getNode(Node[,]nodes, Vector3Int position, out Node n)
     {
         n = null;
@@ -170,9 +170,10 @@ public class Node : IComparer
         {
             for (int x = -1; x <= 1; x++)
             {
+                if (y == 0 && x == 0) continue;
                 if (getNode(nodes, new Vector3Int(position.x + x, position.y + y), out Node n))
                 {
-                    if (!ENTITY.bitHas(n.cellFlags, (uint)CELLFLAG.BLOCKED)) retList.Add(n);
+                    if (n.traversable()) retList.Add(n);
                 }
             }
         }

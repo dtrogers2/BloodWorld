@@ -6,9 +6,10 @@ using System.Collections.Generic;
 public enum COMPONENT
 {
     NONE = 0,
-    POSITION = 1 << 1,
-    GLYPH = 1 << 2,
-    CREATURE = 1 << 3,
-    OVER = 1 << 4,
-    PATH = 1 << 5,
+    POSITION = 1,
+    GLYPH = 1 << 1,
+    CREATURE = 1 << 2,
+    CELLSTACK = 1 << 3,
+    PATH = 1 << 4,
+    STAIN = 1 << 5,
 }
