@@ -35,7 +35,7 @@ public class TestMap
     public static IRegion test(Vector2Int dim, Vector3Int regionPos, Rng rng)
     {
         Vector2Int p = new Vector2Int();
-        Region map = new Region(dim, regionPos, new TermChar { background = ColorHex.Black, c = '.', foreground = ColorHex.Gray });
+        Region map = new Region(dim, regionPos);
         for (p.y = 0; p.y < dim.y; p.y++)
         {
             for (p.x = 0; p.x < dim.x; p.x++)

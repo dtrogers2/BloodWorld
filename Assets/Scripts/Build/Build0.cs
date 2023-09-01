@@ -110,7 +110,7 @@ public class Build : IBuild
     public uint makePlayer()
     {
         Glyph g = new Glyph { c = '@', color = ColorHex.White };
-        Position p = new Position { x = 0, y = 0, z = 0 };
+        Position p = new Position { x = 120, y = 30, z = 0 };
         Creature c = new Creature { name = "player", hpMax = 100, hp = 100, moveRate = 1f, attackRate = 1f, actionPoints = 0f };
         uint player = EntityManager.create();
         ENTITY.subscribe(player, new object[3] { g, p, c}, new COMPONENT[3] { COMPONENT.GLYPH, COMPONENT.POSITION, COMPONENT.CREATURE });
@@ -126,14 +126,6 @@ public class Build : IBuild
     {
         World world = game.world;
         world.addEntity(game.playerId, game);
-        //Vector3Int pos = new Vector3Int(40, 20, 0);
-        //Creature creature = new Creature(pos, "Ant", new TermChar { c = 'a', background = ColorHex.Black, foreground = ColorHex.Red });
-        //Vector3Int pos2 = new Vector3Int(40, 10, 0);
-        //Creature creature2 = new Creature(pos2, "Bat", new TermChar { c = 'b', background = ColorHex.Black, foreground = ColorHex.Black });
-        //creature2.baseMoveCost = 0.5f;
-
-        //world.addEntity(creature, game);
-        //world.addEntity(creature, game);
     }
 
 

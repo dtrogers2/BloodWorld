@@ -22,6 +22,7 @@ public enum ENV
     WALL_W = 12,
     WALL_C = 13,
     WATER = 14,
+    PATH = 15,
 }
 
 public class Env
@@ -47,7 +48,8 @@ public class Env
         new enventry { eid = ENV.WALL_W, data = new object [1] {new Glyph { c = (char) 185, color = ColorHex.White }}, components = new COMPONENT[1] { COMPONENT.GLYPH } },
         // 4 neighbor wall
         new enventry { eid = ENV.WALL_C, data = new object [1] {new Glyph { c = (char) 206, color = ColorHex.White } }, components = new COMPONENT[1] { COMPONENT.GLYPH } },
-        new enventry { eid = ENV.WATER, data = new object[2]{ new Glyph {c = (char) 247, color = ColorHex.Blue}, new Stain { stainflags = (uint) STAIN.WATER, isPool = true, amount = 300} }, components = new COMPONENT[2] { COMPONENT.GLYPH, COMPONENT.STAIN } }
+        new enventry { eid = ENV.WATER, data = new object[2]{ new Glyph {c = (char) 247, color = ColorHex.Blue}, new Stain { stainflags = (uint) STAIN.WATER, isPool = true, amount = 300} }, components = new COMPONENT[2] { COMPONENT.GLYPH, COMPONENT.STAIN } },
+        new enventry { eid = ENV.PATH, data = new object [1] {new Glyph { c = ',', color = ColorHex.White }}, components =new COMPONENT[1] {  COMPONENT.GLYPH } },
     };
     public static void init()
     {

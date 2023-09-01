@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.InteropServices.WindowsRuntime;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -17,13 +19,7 @@ public class MapGen
 
     public IRegion loop(IRegion map, Rng r)
     {
-        for (int y = 0; y < map.dim.y; y++)
-        {
-            for (int x = 0; x < map.dim.x; x++)
-            {
-               map.setCellEntity(Env.get(ENV.FLOOR), new Vector3Int(x, y));
-            }
-        }
+        MapBuilder.addFloor(map);
         int num = 50;
         Vector3Int UL = new Vector3Int();
         Vector3Int XT = new Vector3Int();
@@ -34,70 +30,10 @@ public class MapGen
             draw(map, UL, XT, filled);
             
         }
-        adjustWalls(map);
+        MapBuilder.adjustWalls(map);
         return map;
     }
 
-    public void adjustWalls(IRegion map)
-    {
-        for (int y = 0; y < map.dim.y; y++)
-        {
-            for (int x = 0; x < map.dim.x; x++)
-            {
-                if (y == 0 || y == map.dim.y || x == 0 || x == map.dim.x) continue;
-                uint dirFlags = (uint) DIR.CENTER;
-                uint diagFlags = (uint)DIR.ALL ;
-                if (!ENTITY.bitHas(map.getCellFlags(new Vector3Int(x, y)), (uint) CELLFLAG.BLOCKED)) { continue; }
-
-                if (!ENTITY.bitHas(map.getCellFlags(new Vector3Int(x - 1,    y - 1)), (uint) CELLFLAG.BLOCKED)) diagFlags = ENTITY.bitDel(diagFlags, (uint) DIR.NORTHWEST);
-                if (ENTITY.bitHas(map.getCellFlags(new Vector3Int(x,        y - 1)), (uint)CELLFLAG.BLOCKED)) dirFlags = ENTITY.bitSet(dirFlags, (uint)DIR.NORTH);
-                if (!ENTITY.bitHas(map.getCellFlags(new Vector3Int(x + 1,    y - 1)), (uint)CELLFLAG.BLOCKED)) diagFlags = ENTITY.bitDel(diagFlags, (uint)DIR.NORTHEAST);
-
-                if (ENTITY.bitHas(map.getCellFlags(new Vector3Int(x - 1,    y)), (uint)CELLFLAG.BLOCKED)) dirFlags = ENTITY.bitSet(dirFlags, (uint)(DIR.WEST));
-                if (ENTITY.bitHas(map.getCellFlags(new Vector3Int(x + 1,    y)), (uint)CELLFLAG.BLOCKED)) dirFlags = ENTITY.bitSet(dirFlags, (uint)(DIR.EAST));
-
-                if (!ENTITY.bitHas(map.getCellFlags(new Vector3Int(x - 1,    y + 1)), (uint)CELLFLAG.BLOCKED)) diagFlags = ENTITY.bitDel(diagFlags, (uint)DIR.SOUTHWEST);
-                if (ENTITY.bitHas(map.getCellFlags(new Vector3Int(x,        y + 1)), (uint)CELLFLAG.BLOCKED)) dirFlags = ENTITY.bitSet(dirFlags, (uint)DIR.SOUTH);
-                if (!ENTITY.bitHas(map.getCellFlags(new Vector3Int(x + 1,    y + 1)), (uint)CELLFLAG.BLOCKED)) diagFlags = ENTITY.bitDel(diagFlags, (uint)DIR.SOUTHEAST );
-
-                
-                switch(dirFlags)
-                {
-                    case 3: map.setCellEntity(Env.get(ENV.WALL_WE), new Vector3Int(x, y)); break;
-                    case 5: map.setCellEntity(Env.get(ENV.WALL_WE), new Vector3Int(x, y)); break;
-                    case 7: map.setCellEntity(Env.get(ENV.WALL_WE), new Vector3Int(x, y)); break;
-                    case 15: map.setCellEntity(Env.get(ENV.WALL_WE), new Vector3Int(x, y)); break;
-                    case 23:  map.setCellEntity(Env.get(ENV.WALL_WE), new Vector3Int(x, y)); break;
-                    case 9: map.setCellEntity(Env.get(ENV.WALL_NS), new Vector3Int(x, y)); break;
-                    case 17: map.setCellEntity(Env.get(ENV.WALL_NS), new Vector3Int(x, y)); break;
-                    case 29: map.setCellEntity(Env.get(ENV.WALL_NS), new Vector3Int(x, y)); break;
-                    case 27: map.setCellEntity(Env.get(ENV.WALL_NS), new Vector3Int(x, y)); break;
-                    case 25: map.setCellEntity(Env.get(ENV.WALL_NS), new Vector3Int(x, y)); break;
-                    case 21: map.setCellEntity(Env.get(ENV.WALL_NW), new Vector3Int(x, y)); break;
-                    case 13: map.setCellEntity(Env.get(ENV.WALL_NE), new Vector3Int(x, y)); break;
-                    case 19: map.setCellEntity(Env.get(ENV.WALL_SW), new Vector3Int(x, y)); break;
-                    case 11: map.setCellEntity(Env.get(ENV.WALL_SE), new Vector3Int(x, y)); break;
-                    case 31:
-                        {
-                           
-                            switch(diagFlags)
-                            {
-                                case (uint)DIR.ALL: break;
-                                case 479: map.setCellEntity(Env.get(ENV.WALL_SE), new Vector3Int(x, y)); break;
-                                case 447: map.setCellEntity(Env.get(ENV.WALL_SW), new Vector3Int(x, y)); break;
-                                case 383: map.setCellEntity(Env.get(ENV.WALL_NE), new Vector3Int(x, y)); break;
-                                case 255: map.setCellEntity(Env.get(ENV.WALL_NW), new Vector3Int(x, y)); break;
-                                default: break;
-                            }
-                            break;
-                        }
-                     
-                    default: break;
-                }
-
-            }
-        }
-    }
 
     public void pick(IRegion map, Vector3Int UL, Vector3Int XT, out Vector3Int UL2, out Vector3Int XT2)
     {
@@ -173,25 +109,49 @@ public class MapGen
     {
         Vector2Int dim = Term.StockDim();
         MapGen gen = new MapGen(game, rng);
-        Region map = new Region(dim, regionPos, new TermChar { background = ColorHex.Black, c = '.', foreground = ColorHex.GrayDark });
-        return gen.loop(map, rng);
+        Region map = new Region(dim, regionPos);
+        //if (rng.oneIn(2)) map.regionflags = ENTITY.bitSet(map.regionflags, (uint)REGIONFLAGS.CLOSED);
+        //Add neighor map exits
+        if (game.world.hasRegion(regionPos + Vector3Int.down))
+        {
+            map.exits[(uint)EXITS.NORTH] = game.world.regions[regionPos.x, regionPos.y - 1, regionPos.z].exits[(uint)EXITS.SOUTH];
+            if (map.exits[(uint)EXITS.NORTH].Length > 0)
+                map.exits[(uint)EXITS.NORTH][0].y = 0;
+        }
+        if (game.world.hasRegion(regionPos + Vector3Int.right))
+        {
+            map.exits[(uint)EXITS.EAST] = game.world.regions[regionPos.x + 1, regionPos.y, regionPos.z].exits[(uint)EXITS.WEST];
+            if (map.exits[(uint)EXITS.EAST].Length > 0)
+                map.exits[(uint)EXITS.EAST][0].x = map.dim.x - 1;
+        }
+        if (game.world.hasRegion(regionPos + Vector3Int.up))
+        {
+            map.exits[(uint)EXITS.SOUTH] = game.world.regions[regionPos.x, regionPos.y + 1, regionPos.z].exits[(uint)EXITS.NORTH];
+            if (map.exits[(uint)EXITS.SOUTH].Length > 0)
+                map.exits[(uint)EXITS.SOUTH][0].y = map.dim.y - 1;
+        }
+        if (game.world.hasRegion(regionPos + Vector3Int.left))
+        {
+            map.exits[(uint)EXITS.WEST] = game.world.regions[regionPos.x - 1, regionPos.y, regionPos.z].exits[(uint)EXITS.EAST];
+            if (map.exits[(uint)EXITS.WEST].Length > 0)
+                map.exits[(uint)EXITS.WEST][0].x = 0;
+        }
+        BaseMap bm = new BaseMap(dim, map);
+        int chance = rng.rng(7);
+        return new RndBox_Algo().run(Vector2Int.zero, dim, rng, bm);
+        /*
+        switch (chance)
+        {
+            case 0: return new BrokenColumn_Algo().run(Vector2Int.zero,dim, rng, bm);
+            case 1: return new HorzVert_Algo().run(Vector2Int.zero, dim, rng, bm);
+            case 2: return new HorzVert_Algo().run(Vector2Int.zero, dim, rng, bm);
+            case 3: return gen.loop(map, rng);
+            default: return new RndBox_Algo().run(Vector2Int.zero, dim, rng, bm); ;
+        }*/
     }
 
-    public bool roomsIntersect(Room a, Room b)
-    {
-        return (a.y + a.height > b.y || b.y + b.height > a.y || a.x + a.width > b.x || b.x + b.width > a.x);
-    }
 
-}
 
-public struct Room
-{
-    public int x;
-    public int y;
-    public int width;
-    public int height;
-    public bool isHall;
-    public bool hasHall;
 }
 
 [Flags]

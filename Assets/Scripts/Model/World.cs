@@ -9,7 +9,7 @@ using static UnityEditor.PlayerSettings;
 public class World
 {
     Vector3Int worldDim;
-    IRegion[,,] regions;
+    public IRegion[,,] regions;
 
     public World(Vector3Int worldDim)
     {
@@ -104,7 +104,7 @@ public class World
             {
 
                 cellBits = r.getCellFlags(worldPos);
-                if (cellBits == 0) { return false; }
+                //if (cellBits == 0) { return false; }
 
                 return true;
             }
@@ -121,7 +121,7 @@ public class World
             {
                 
                 cellBits = r.getCellEntity(worldPos);
-                if (cellBits == 0) { return false; }
+                //if (cellBits == 0) { return false; }
                 
                 return true;
             }

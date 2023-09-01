@@ -9,6 +9,8 @@ public interface IRegion
 {
     Vector2Int dim { get; }
     public Vector3Int regionPos { get; }
+    public uint regionflags { get; set; }
+    public Vector3Int[][] exits { get; set; }
     public void addEntity(uint entity);
     public void removeEntity(uint entity);
     bool legal(Vector3Int pos);
@@ -34,13 +36,14 @@ public class Region : IRegion
     public List<Creature> creatureList { get; } = new List<Creature>();
     public uint[,] cells { get; }
     public HashSet<uint> entities { get; } = new HashSet<uint>();
+    public uint regionflags { get; set; }
+    public Vector3Int[][] exits { get; set; } = new[] { new Vector3Int[0], new Vector3Int[0] , new Vector3Int[0] , new Vector3Int[0], new Vector3Int[0], new Vector3Int[0] };
 
-    public Region(Vector2Int dim, Vector3Int regionPos, TermChar floor)
+    public Region(Vector2Int dim, Vector3Int regionPos)
     {
         this.dim = dim;
         this.regionPos = regionPos;
         cells = new uint[dim.x, dim.y];
-
     }
 
 
@@ -142,4 +145,25 @@ public class Region : IRegion
         }
     }
 
+}
+[Flags]
+public enum REGIONFLAGS: uint
+{
+    NONE = 0,
+    OPEN = 1,
+    CLOSED = 1 << 1,
+    SETTLEMENT = 1 << 2,
+    WASTELAND = 1 << 3,
+    MOUNDS = 1 << 4,
+    CANYON = 1 << 5,
+}
+
+public enum EXITS: int
+{
+    NORTH = 1,
+    EAST = 2,
+    SOUTH = 3,
+    WEST = 4,
+    UP = 5,
+    DOWN = 6,
 }
