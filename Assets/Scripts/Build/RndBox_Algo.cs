@@ -7,8 +7,8 @@ public class RndBox_Algo
     private List<Room> rooms = new List<Room>();
     public IRegion run(Vector2Int posStart, Vector2Int posEnd, Rng r, MapDrawerIF dm)
     {
-        //if (ENTITY.bitHas(dm.map.regionflags, (uint)REGIONFLAGS.CLOSED)) { MapBuilder.addFence(dm.map, (uint)ENV.WALL, (uint)ENV.WALL); }
-        //else MapBuilder.addFloor(dm.map);
+        if (ENTITY.bitHas(dm.map.regionflags, (uint)REGIONFLAGS.CLOSED)) { MapBuilder.addFence(dm.map, (uint)ENV.WALL, (uint)ENV.WALL); }
+        else MapBuilder.addFloor(dm.map);
         // Swap the start and end
         if (posStart.x > posEnd.x)
         {
@@ -32,7 +32,7 @@ public class RndBox_Algo
         {
             addBox(dm, dim, r);
         }
-        MapBuilder.connectRooms(rooms, r, dm, ENV.FLOOR, ENV.PATH);
+        MapBuilder.connectRooms(rooms, r, dm);
         MapBuilder.addExits(dm, r, rooms);
         MapBuilder.adjustWalls(dm.map);
         return dm.map;
@@ -52,7 +52,7 @@ public class RndBox_Algo
             MapBuilder.makeRect(e, f, dm, ENV.FLOOR, ENV.FLOOR);
         } else
         {
-            MapBuilder.makeRect(e, f, dm, ENV.WALL, ENV.FLOOR, ENV.FLOOR);
+            MapBuilder.makeRect(e, f, dm, ENV.WALL, ENV.EMPTY, ENV.FLOOR);
         }
         
         rooms.Add(new Room { pos = e, dim = f, hasWall = !ENTITY.bitHas(dm.map.regionflags, (uint)REGIONFLAGS.CLOSED) });

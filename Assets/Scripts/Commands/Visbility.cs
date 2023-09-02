@@ -14,7 +14,7 @@ public class Visbility
             {
                 if ((p.x == a.x && p.y == a.y) || (p.x == b.x && p.y == b.y)) continue;
                 if (visionOnly && ENTITY.bitHas(cellFlags, (uint)(CELLFLAG.OPAQUE))) return false;
-                else if (ENTITY.bitHas(cellFlags, (uint)(CELLFLAG.OPAQUE | CELLFLAG.BLOCKED | CELLFLAG.CREATURE))) return false;
+                else if (!visionOnly && ENTITY.bitHas(cellFlags, (uint)(CELLFLAG.OPAQUE | CELLFLAG.BLOCKED | CELLFLAG.CREATURE))) return false;
             } else
             {
                 return false;

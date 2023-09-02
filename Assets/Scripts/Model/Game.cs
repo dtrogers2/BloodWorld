@@ -31,10 +31,9 @@ public class Game : IGame
     public IAI ai { get; set; }
     public IBuild build { get ; set ; }
 
-    public Game(Rng rng,uint playerId, IBuild build)
+    public Game(Rng rng, IBuild build)
     {
         this.rng = rng;
-        this.playerId = playerId;
         this.build = build;
 
     }

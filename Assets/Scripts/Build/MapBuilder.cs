@@ -52,10 +52,10 @@ public class MapBuilder
             dm.map.exits[(uint)EXITS.WEST] = new Vector3Int[] { new Vector3Int(0, y) };
         }
 
-        makePath(new Vector2Int(r.rng(dm.map.dim.x), r.rng(dm.map.dim.y)), (Vector2Int)dm.map.exits[(uint)EXITS.NORTH][0], dm, ENV.PATH, ENV.EMPTY);
-        makePath(new Vector2Int(r.rng(dm.map.dim.x), r.rng(dm.map.dim.y)), (Vector2Int)dm.map.exits[(uint)EXITS.EAST][0], dm, ENV.PATH, ENV.EMPTY);
-        makePath(new Vector2Int(r.rng(dm.map.dim.x), r.rng(dm.map.dim.y)), (Vector2Int)dm.map.exits[(uint)EXITS.SOUTH][0], dm, ENV.PATH, ENV.EMPTY);
-        makePath(new Vector2Int(r.rng(dm.map.dim.x), r.rng(dm.map.dim.y)), (Vector2Int)dm.map.exits[(uint)EXITS.WEST][0], dm, ENV.PATH, ENV.EMPTY);
+        makePath(new Vector2Int(r.rng(dm.map.dim.x), r.rng(dm.map.dim.y)), (Vector2Int)dm.map.exits[(uint)EXITS.NORTH][0], dm, ENV.FLOOR, ENV.EMPTY);
+        makePath(new Vector2Int(r.rng(dm.map.dim.x), r.rng(dm.map.dim.y)), (Vector2Int)dm.map.exits[(uint)EXITS.EAST][0], dm, ENV.FLOOR, ENV.EMPTY);
+        makePath(new Vector2Int(r.rng(dm.map.dim.x), r.rng(dm.map.dim.y)), (Vector2Int)dm.map.exits[(uint)EXITS.SOUTH][0], dm, ENV.FLOOR, ENV.EMPTY);
+        makePath(new Vector2Int(r.rng(dm.map.dim.x), r.rng(dm.map.dim.y)), (Vector2Int)dm.map.exits[(uint)EXITS.WEST][0], dm, ENV.FLOOR, ENV.EMPTY);
     }
 
     public static void addExits(MapDrawerIF dm, Rng r, List<Room> rooms)
@@ -81,26 +81,40 @@ public class MapBuilder
             int y = r.rng(dm.map.dim.y);
             dm.map.exits[(uint)EXITS.WEST] = new Vector3Int[] { new Vector3Int(0, y) };
         }
-
         Room nearest = nearestRoom(rooms, (Vector2Int)dm.map.exits[(uint)EXITS.NORTH][0]);
-        //List<Vector2Int> edges = rectEdges(nearest.pos, nearest.dim);
-        //Vector2Int edge = edges[r.rng(edges.Count)];
-        makePath(nearest.center, (Vector2Int)dm.map.exits[(uint)EXITS.NORTH][0], dm, ENV.PATH, ENV.FLOOR);
+        if (dm.map.regionPos.y != 0)
+        {
+           
+            //List<Vector2Int> edges = rectEdges(nearest.pos, nearest.dim);
+            //Vector2Int edge = edges[r.rng(edges.Count)];
+            makePath(nearest.center, (Vector2Int)dm.map.exits[(uint)EXITS.NORTH][0], dm, ENV.FLOOR, ENV.EMPTY);
+        }
 
-        nearest = nearestRoom(rooms, (Vector2Int)dm.map.exits[(uint)EXITS.EAST][0]);
-        //edges = rectEdges(nearest.pos, nearest.dim);
-        //edge = edges[r.rng(edges.Count)];
-        makePath(nearest.center, (Vector2Int)dm.map.exits[(uint)EXITS.EAST][0], dm, ENV.PATH, ENV.FLOOR);
+        if (dm.map.regionPos.x != World.worldDim.x - 1)
+        {
+            nearest = nearestRoom(rooms, (Vector2Int)dm.map.exits[(uint)EXITS.EAST][0]);
+            //edges = rectEdges(nearest.pos, nearest.dim);
+            //edge = edges[r.rng(edges.Count)];
+            makePath(nearest.center, (Vector2Int)dm.map.exits[(uint)EXITS.EAST][0], dm, ENV.FLOOR, ENV.EMPTY);
+        }
 
-        nearest = nearestRoom(rooms, (Vector2Int)dm.map.exits[(uint)EXITS.SOUTH][0]);
-        //edges = rectEdges(nearest.pos, nearest.dim);
-        //edge = edges[r.rng(edges.Count)];
-        makePath(nearest.center, (Vector2Int)dm.map.exits[(uint)EXITS.SOUTH][0], dm, ENV.PATH, ENV.FLOOR);
+        if (dm.map.regionPos.y != World.worldDim.y - 1)
+        {
+            nearest = nearestRoom(rooms, (Vector2Int)dm.map.exits[(uint)EXITS.SOUTH][0]);
+            //edges = rectEdges(nearest.pos, nearest.dim);
+            //edge = edges[r.rng(edges.Count)];
+            makePath(nearest.center, (Vector2Int)dm.map.exits[(uint)EXITS.SOUTH][0], dm, ENV.FLOOR, ENV.EMPTY);
+        }
 
-        nearest = nearestRoom(rooms, (Vector2Int)dm.map.exits[(uint)EXITS.WEST][0]);
-        //edges = rectEdges(nearest.pos, nearest.dim);
-        //edge = edges[r.rng(edges.Count)];
-        makePath(nearest.center, (Vector2Int)dm.map.exits[(uint)EXITS.WEST][0], dm, ENV.PATH, ENV.FLOOR);
+        if (dm.map.regionPos.x != 0)
+        {
+            nearest = nearestRoom(rooms, (Vector2Int)dm.map.exits[(uint)EXITS.WEST][0]);
+            //edges = rectEdges(nearest.pos, nearest.dim);
+            //edge = edges[r.rng(edges.Count)];
+            makePath(nearest.center, (Vector2Int)dm.map.exits[(uint)EXITS.WEST][0], dm, ENV.FLOOR, ENV.EMPTY);
+        }
+
+
     }
 
     public static void addFloor(IRegion map, ENV env = ENV.FLOOR)
@@ -136,6 +150,7 @@ public class MapBuilder
         }
     }
 
+
     public static void makeRect(Vector2Int src, Vector2Int dim, MapDrawerIF md, ENV wall = ENV.WALL, ENV floor = ENV.FLOOR, ENV hard = ENV.FLOOR)
     {
         for (int y = 0; y <= dim.y; y++)
@@ -147,6 +162,7 @@ public class MapBuilder
             }
         }
     }
+
     public static void connectRooms(List<Room> rooms, Rng r, MapDrawerIF md, ENV connector = ENV.FLOOR, ENV hard = ENV.FLOOR)
     {
         List<Room> connected = new List<Room>();
@@ -183,14 +199,6 @@ public class MapBuilder
         
         Vector2Int aC = a.center;
         Vector2Int bC = b.center;
-        /*
-        if (Vector2Int.Distance(Vector2Int.zero, aC) > Vector2Int.Distance(Vector2Int.zero, bC))
-        {
-            Vector2Int swap = aC;
-            aC = bC;
-            bC = swap;
-        }
-        */
         makePath(aC, bC, md, connector, hard);
     }
 

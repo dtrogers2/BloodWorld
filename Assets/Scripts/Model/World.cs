@@ -8,20 +8,20 @@ using static UnityEditor.PlayerSettings;
 
 public class World
 {
-    Vector3Int worldDim;
+    public static Vector3Int worldDim = new Vector3Int(3, 3, 3);
     public IRegion[,,] regions;
 
-    public World(Vector3Int worldDim)
+    public World(Vector3Int d)
     {
-        this.worldDim = worldDim;
+        worldDim = d;
         regions = new IRegion[worldDim.x, worldDim.y, worldDim.z];
     }
 
     public bool getRegion(Vector3Int worldPos, IGame game, out IRegion r)
     {
         r = null;
-        if (!(worldPos.x >= 0 && worldPos.x < this.worldDim.x * Term.StockDim().x 
-            && worldPos.y >= 0 && worldPos.y < this.worldDim.y * Term.StockDim().y 
+        if (!(worldPos.x >= 0 && worldPos.x < worldDim.x * Term.StockDim().x 
+            && worldPos.y >= 0 && worldPos.y < worldDim.y * Term.StockDim().y 
             && worldPos.z >= 0 && worldPos.z < worldDim.z)) return false;
         Vector3Int rP = regionPosition(worldPos);
         if (!hasRegion(rP))
@@ -111,6 +111,18 @@ public class World
         }
         return false;
     }
+
+    public void setCellFlags(Vector3Int worldPos, IGame game, CELLFLAG flags)
+    {
+        Vector2Int stockTerm = Term.StockDim();
+        if (worldPos.x >= 0 && worldPos.x < worldDim.x * stockTerm.x && worldPos.y >= 0 && worldPos.y < worldDim.y * stockTerm.y && worldPos.z >= 0 && worldPos.z < worldDim.z)
+        {
+            if (getRegion(worldPos, game, out IRegion r))
+            {
+                r.setCellFlags(flags, worldPos);
+            }
+        }
+    }
     public bool getCellEntity(Vector3Int worldPos, IGame game, out uint cellBits)
     {
         cellBits = 0;
@@ -136,7 +148,7 @@ public class World
 
     public bool hasRegion(Vector3Int pos)
     {
-        if (pos.x >= 0 && pos.x < this.worldDim.x && pos.y >= 0 && pos.y < this.worldDim.y && pos.z >= 0)
+        if (pos.x >= 0 && pos.x < worldDim.x && pos.y >= 0 && pos.y < worldDim.y && pos.z >= 0)
         {
             return (regions[pos.x, pos.y, pos.z] != null);
         }

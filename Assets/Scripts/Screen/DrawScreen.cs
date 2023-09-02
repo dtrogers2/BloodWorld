@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,17 +38,59 @@ public class DrawScreen
         {
             for (t.x = 0, w.x = viewPortStart.x; w.x < viewPortEnd.x; w.x++, t.x++)
             {
-                if (game.world.getCellEntity(w, game, out uint cell))
+                char c = outside.c;
+                string fg = outside.foreground;
+                string bg = outside.background;
+                if (game.world.getCellFlags(w, game, out uint cell))
                 {
-                    if (ENTITY.has(cell, COMPONENT.GLYPH))
+                    uint entity = cell >> Enum.GetNames(typeof(CELLFLAG)).Length;
+                    if (ENTITY.has(game.playerId, COMPONENT.POSITION))
                     {
-                       Glyph g = (Glyph)ComponentManager.get(COMPONENT.GLYPH).data[cell];
-                       term.at(t.x, t.y, g.c, g.color, termChar.background);
+                        Position p = (Position)ComponentManager.get(COMPONENT.POSITION).data[game.playerId];
+                        bool canSee = Visbility.lineTo(new Vector3Int(p.x, p.y), w, game, true);
+                        if (canSee)
+                        {
+                            //Set seen flag
+                            game.world.setCellFlags(viewPortStart + (Vector3Int)t, game, CELLFLAG.SEEN);
+                            
+                            if (ENTITY.has(entity, COMPONENT.GLYPH))
+                            {
+                                Glyph g = (Glyph)ComponentManager.get(COMPONENT.GLYPH).data[entity];
+                                c = g.c;
+                                fg = g.color;
+                            }
+                        } else // Can't see, set the glyph to non-creature on the stack
+                        {
+                            if (ENTITY.bitHas(cell, (uint) CELLFLAG.SEEN))
+                            {
+                                if (!ENTITY.has(entity, COMPONENT.CREATURE))
+                                {
+                                    Glyph g = (Glyph)ComponentManager.get(COMPONENT.GLYPH).data[entity];
+                                    c = g.c;
+                                    fg = ColorHex.GrayDark;
+                                } else
+                                {
+                                    bool hasNext = true;
+                                    while (hasNext)
+                                    {
+                                        if (ENTITY.has(entity, COMPONENT.CELLSTACK))
+                                        {
+                                            CellStack cS = (CellStack)ComponentManager.get(COMPONENT.CELLSTACK).data[entity];
+                                            entity = cS.entity;
+                                            if (!ENTITY.has(entity, COMPONENT.CREATURE)) {
+                                                hasNext = false;
+                                                Glyph g = (Glyph)ComponentManager.get(COMPONENT.GLYPH).data[entity];
+                                                c = g.c;
+                                                fg = ColorHex.GrayDark;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
-                } else
-                {
-                    term.at(t.x, t.y, outside.c, outside.foreground, outside.background);
                 }
+                term.at(t.x, t.y, c, fg, bg);
             }
         }
     }
@@ -129,5 +172,5 @@ public class DrawScreen
         string mask = new string(' ', dim.x);
         return s + mask.Substring(0, dim.x - s.Length);
     }
-    public static TermChar outside = new TermChar { background = ColorHex.Black, c = '.', foreground = ColorHex.GrayDark};
+    public static TermChar outside = new TermChar { background = ColorHex.Black, c = ' ', foreground = ColorHex.GrayDark};
 }

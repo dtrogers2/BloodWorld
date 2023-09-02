@@ -1,6 +1,8 @@
+using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static Unity.Burst.Intrinsics.X86;
 using static UnityEngine.EventSystems.EventTrigger;
 
 public class Build : IBuild
@@ -11,9 +13,9 @@ public class Build : IBuild
         initComponents();
         makeEnv();
         Rng rng = new Rng(42);
-        uint playerId = makePlayer();
-        Game game = new Game(rng, playerId, this);
-        enterFirstLevel0(game);
+        Game game = new Game(rng, this);
+        makePlayer(game);
+        //enterFirstLevel0(game);
         game.ai = makeAI();
         return game;
     }
@@ -60,7 +62,10 @@ public class Build : IBuild
 
     public void makeMobs(IGame game, IRegion map, int rate)
     {
-        for(int y = 0; y < map.dim.y; y++)
+        int seed2 = map.regionPos.y;
+        int seed3 = map.regionPos.z;
+        Rng r = new Rng(game.rng.getSeed() + map.regionPos.x + (seed2 * 100) + (seed3 * 1000));
+        for (int y = 0; y < map.dim.y; y++)
         {
             for (int x = 0; x < map.dim.x; x++)
             {
@@ -70,7 +75,7 @@ public class Build : IBuild
                 if (game.rng.pct(rate))
                 {
                     Vector3Int posWorld = new Vector3Int(x + (map.dim.x * map.regionPos.x), y + (map.dim.y * map.regionPos.y), map.regionPos.z);
-                    int roll = game.rng.rngC(1, MonData.entries.Length);
+                    int roll = r.rngC(1, MonData.entries.Length);
                     monsterentry entry = MonData.entries[roll];
 
                     //Glyph g = new Glyph { c = entry.basechar, color = entry.color };
@@ -103,18 +108,36 @@ public class Build : IBuild
     public IRegion makeMap(IGame game, Rng rng, Vector3Int regionPos)
     {
         Vector2Int dim = Term.StockDim();
-        IRegion map = MapGen.test(game, regionPos, rng);
+        IRegion map = MapGen.test(game, regionPos);
         return map;
     }
 
-    public uint makePlayer()
+    public void makePlayer(IGame game)
     {
+        Rng rng = new Rng(game.rng.getSeed());
+        bool foundPosition = false;
+        int x = 0;
+        int y = 0;
+        while (!foundPosition)
+        {
+            x = rng.rngC(Term.StockDim().x, Term.StockDim().x * 2);
+            y = rng.rngC(Term.StockDim().x, Term.StockDim().y * 2);
+            int xLocal = x % Term.StockDim().x;
+            int yLocal = y % Term.StockDim().y;
+            if (game.world.getRegion(new Vector3Int(x, y), game, out IRegion r)) {
+                uint cellFlags = r.getCellFlags(new Vector3Int(xLocal, yLocal));
+                if (ENTITY.bitHas(cellFlags, (uint)(CELLFLAG.BLOCKED | CELLFLAG.CREATURE))) { continue; }
+                foundPosition = true;
+            }
+
+        }
         Glyph g = new Glyph { c = '@', color = ColorHex.White };
-        Position p = new Position { x = 120, y = 30, z = 0 };
+        Position p = new Position { x = x, y = y, z = 0 };
         Creature c = new Creature { name = "player", hpMax = 100, hp = 100, moveRate = 1f, attackRate = 1f, actionPoints = 0f };
         uint player = EntityManager.create();
         ENTITY.subscribe(player, new object[3] { g, p, c}, new COMPONENT[3] { COMPONENT.GLYPH, COMPONENT.POSITION, COMPONENT.CREATURE });
-        return player;
+        game.playerId = player;
+        game.world.addEntity(game.playerId, game);
     }
 
     public Vector2Int centorPos(Vector2Int dim)

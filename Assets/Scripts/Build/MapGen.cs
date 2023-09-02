@@ -105,12 +105,15 @@ public class MapGen
         }
     }
 
-    public static IRegion test(IGame game, Vector3Int regionPos, Rng rng)
+    public static IRegion test(IGame game, Vector3Int regionPos)
     {
         Vector2Int dim = Term.StockDim();
-        MapGen gen = new MapGen(game, rng);
+        int seed2 = regionPos.y;
+        int seed3 = regionPos.z;
+        Rng r = new Rng(game.rng.getSeed() + regionPos.x + (seed2 * 100) + (seed3 * 1000));
+        MapGen gen = new MapGen(game, r);
         Region map = new Region(dim, regionPos);
-        //if (rng.oneIn(2)) map.regionflags = ENTITY.bitSet(map.regionflags, (uint)REGIONFLAGS.CLOSED);
+        if (r.oneIn(2)) map.regionflags = ENTITY.bitSet(map.regionflags, (uint)REGIONFLAGS.CLOSED);
         //Add neighor map exits
         if (game.world.hasRegion(regionPos + Vector3Int.down))
         {
@@ -137,8 +140,8 @@ public class MapGen
                 map.exits[(uint)EXITS.WEST][0].x = 0;
         }
         BaseMap bm = new BaseMap(dim, map);
-        int chance = rng.rng(7);
-        return new RndBox_Algo().run(Vector2Int.zero, dim, rng, bm);
+        int chance = r.rng(7);
+        return new RndBox_Algo().run(Vector2Int.zero, dim, r, bm);
         /*
         switch (chance)
         {

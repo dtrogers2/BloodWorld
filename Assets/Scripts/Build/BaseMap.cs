@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class BaseMap : MapDrawerIF
@@ -17,6 +18,15 @@ public class BaseMap : MapDrawerIF
     public void carve(Vector2Int pos, ENV env, ENV hard)
     {
         if (map.getCellEntity((Vector3Int)pos) == (uint)hard) return;
+        map.setCellEntity((uint)env, (Vector3Int)pos);
+        if (env == ENV.WALL) map.setCellFlags(CELLFLAG.BLOCKED | CELLFLAG.OPAQUE, (Vector3Int)pos);
+        else map.delCellFlags(CELLFLAG.BLOCKED | CELLFLAG.OPAQUE, (Vector3Int)pos);
+    }
+
+    public void carve(Vector2Int pos, ENV env, params ENV[] hard)
+    {
+        uint e = map.getCellEntity((Vector3Int)pos);
+        if (hard.Contains((ENV) e)) return;
         map.setCellEntity((uint)env, (Vector3Int)pos);
         if (env == ENV.WALL) map.setCellFlags(CELLFLAG.BLOCKED | CELLFLAG.OPAQUE, (Vector3Int)pos);
         else map.delCellFlags(CELLFLAG.BLOCKED | CELLFLAG.OPAQUE, (Vector3Int)pos);
