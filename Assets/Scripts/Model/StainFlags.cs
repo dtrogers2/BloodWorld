@@ -10,6 +10,7 @@ public enum STAIN
     WATER = 1,
     BLOOD = 1 << 2,
     OIL = 1 << 3,
+    SOOT = 1 << 4,
 
     
 }

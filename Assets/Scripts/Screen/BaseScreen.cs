@@ -90,35 +90,9 @@ public class BaseScreen : IScreen
         if (ENTITY.has(game.playerId, COMPONENT.CREATURE))
         {
             Creature c = (Creature)ComponentManager.get(COMPONENT.CREATURE).data[game.playerId];
-
-            for (int stainCount = ComponentManager.get(COMPONENT.STAIN).entities.Count - 1; stainCount > 0; stainCount--)
-            {
-                uint stainId = ComponentManager.get(COMPONENT.STAIN).entities[stainCount];
-                if (!Env.isEnv(stainId))
-                {
-                    
-                    Stain s = (Stain)ComponentManager.get(COMPONENT.STAIN).data[stainId];
-                    s.amount += c.actionPoints;
-
-                    if (s.amount <= 0)
-                    {
-                        ENTITY.unsubscribe(stainId, COMPONENT.STAIN);
-                        uint flags = ENTITY.get(stainId);
-
-                        if (ENTITY.bitIs(flags, (uint) (COMPONENT.GLYPH | COMPONENT.POSITION | COMPONENT.CELLSTACK))) // If stain was just a stain entity, recycle it
-                        {
-                            game.world.removeEntity(stainId, game);
-                            ENTITY.unsubscribe(stainId, new COMPONENT[2] { COMPONENT.GLYPH, COMPONENT.POSITION});
-                            
-                        }
-                    }
-                }
-            }
-
+            StainSystem.update(-c.actionPoints, game);
             c.actionPoints = 0f;
         }
-
-
     }
     public void handleMsgs(IStack s)
     {

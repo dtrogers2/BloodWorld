@@ -141,16 +141,14 @@ public class MapGen
         }
         BaseMap bm = new BaseMap(dim, map);
         int chance = r.rng(7);
-        return new RndBox_Algo().run(Vector2Int.zero, dim, r, bm);
-        /*
         switch (chance)
         {
-            case 0: return new BrokenColumn_Algo().run(Vector2Int.zero,dim, rng, bm);
-            case 1: return new HorzVert_Algo().run(Vector2Int.zero, dim, rng, bm);
-            case 2: return new HorzVert_Algo().run(Vector2Int.zero, dim, rng, bm);
-            case 3: return gen.loop(map, rng);
-            default: return new RndBox_Algo().run(Vector2Int.zero, dim, rng, bm); ;
-        }*/
+            case 0: return new BrokenColumn_Algo().run(Vector2Int.zero,dim, r, bm);
+            case 1: return new HorzVert_Algo().run(Vector2Int.zero, dim, r, bm);
+            case 2: return new HorzVert_Algo().run(Vector2Int.zero, dim, r, bm);
+            case 3: return new RndBox_Algo().run(Vector2Int.zero, dim, r, bm);
+            default: return gen.loop(map, r);
+        }
     }
 
 
