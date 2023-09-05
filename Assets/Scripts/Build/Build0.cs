@@ -133,10 +133,13 @@ public class Build : IBuild
         }
         Glyph g = new Glyph { c = '@', color = ColorHex.White };
         Position p = new Position { x = x, y = y, z = 0 };
-        Creature c = new Creature { name = "player", hpMax = 100, hp = 100, moveRate = 1f, attackRate = 1f, actionPoints = 0f };
+        Creature c = new Creature { name = "Player", moveSpeed = 30, AP = 0f, vision = 8, classes = CLASS.NONE, levels = new int[] { 5, 0, 3, 0, 0, 0, 0, 0, 0 } };
+        Defenses d = new Defenses { };
+        Attacks a = new Attacks { baseAtkRate = 1f, atkUsed = 0, attacks = new Attack[1] { new Attack { name = "strike", dmgDice = "1d3", atkRate = 1f } } };
         uint player = EntityManager.create();
-        ENTITY.subscribe(player, new object[3] { g, p, c}, new COMPONENT[3] { COMPONENT.GLYPH, COMPONENT.POSITION, COMPONENT.CREATURE });
+        ENTITY.subscribe(player, new object[] { g, p, c, d, a}, new COMPONENT[] { COMPONENT.GLYPH, COMPONENT.POSITION, COMPONENT.CREATURE, COMPONENT.DEFENSES, COMPONENT.ATTACK });
         game.playerId = player;
+        HealthAdj.initHD(game.playerId, game);
         game.world.addEntity(game.playerId, game);
     }
 

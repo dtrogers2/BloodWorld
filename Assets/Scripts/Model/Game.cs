@@ -8,8 +8,8 @@ public interface IGame
     public Rng rng { get; set; }
     public uint playerId { get; set; }
     public IAI ai { get; set; }
-    public void msg(string s);
-    public void flash(string s);
+    public void msg(Msg s);
+    public void flash(Msg s);
     public MsgLog log { get; }
 
     public World world { get; set; } 
@@ -38,13 +38,13 @@ public class Game : IGame
 
     }
 
-    public void msg(string s)
+    public void msg(Msg s)
     {
-        this.log.msg(s, false);
+        this.log.msg(s, time, false);
     }
 
-    public void flash(string s)
+    public void flash(Msg s)
     {
-        this.log.msg(s, true);
+        this.log.msg(s, time, true);
     }
 } 

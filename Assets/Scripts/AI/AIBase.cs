@@ -15,11 +15,11 @@ public class AIBase : IAI
         Vector3Int dir = Vector3Int.zero;
         Position p1 = (Position) ComponentManager.get(COMPONENT.POSITION).data[me];
         Position p2 = (Position) ComponentManager.get(COMPONENT.POSITION).data[tgt];
+        Creature c = (Creature)ComponentManager.get(COMPONENT.CREATURE).data[me];
         Vector3Int mePos = new Vector3Int(p1.x, p1.y, p1.z);
-        
         Vector3Int tgtPos = new Vector3Int(p2.x, p2.y, p2.z);
         float tgtDistance = Vector3Int.Distance(mePos, tgtPos);
-        if (tgtDistance <= 10)
+        if (tgtDistance <= c.vision)
         {
             if (tgtDistance < 2)
             {

@@ -8,15 +8,18 @@ public class MonData
 {
     public static monsterentry[] entries = new monsterentry[]
     {
-        new monsterentry { mid = MONTYPE.ERROR, data = new object[2] {new Glyph { c = 'E', color = ColorHex.Red },
-            new Creature { name = "Error", actionPoints = 0f, attackRate = 1f, moveRate = 1f, hp = 1, hpMax = 1 } }
+        new monsterentry { mid = MONTYPE.ERROR, data = new object[] {
+            new Glyph { c = 'E', color = ColorHex.Red },
+            new Creature { name = "Error", AP = 0f, moveSpeed = 0, vision = 5} }
             , components = new COMPONENT[2] {COMPONENT.GLYPH, COMPONENT.CREATURE}
         },
-        new monsterentry { mid = MONTYPE.HUMAN, data = new object[2] {new Glyph { c = 'h', color = ColorHex.White }, new Creature { name = "Human", actionPoints = 0f, attackRate = 1f, moveRate = 1f, hp = 3, hpMax = 3 } }, components = new COMPONENT[2] {COMPONENT.GLYPH, COMPONENT.CREATURE}
-        },
-        new monsterentry { mid = MONTYPE.BAT, data = new object[2] {new Glyph { c = 'b', color = ColorHex.GrayDark }, new Creature { name = "Bat", actionPoints = 0f, attackRate = 1f, moveRate = 0.5f, hp = 2, hpMax = 2 } }, components = new COMPONENT[2] {COMPONENT.GLYPH, COMPONENT.CREATURE}
-        },
-        new monsterentry { mid = MONTYPE.RAT, data = new object[2] {new Glyph { c = 'r', color = ColorHex.BlueDark }, new Creature { name = "Rat", actionPoints = 0f, attackRate = 1f, moveRate = 1f, hp = 1, hpMax = 1 } }, components = new COMPONENT[2] {COMPONENT.GLYPH, COMPONENT.CREATURE}
+        new monsterentry { mid = MONTYPE.HUMAN, data = new object[] {
+            new Glyph { c = '@', color = ColorHex.White },
+            new Creature { name = "Human", AP = 0f, moveSpeed = 30, vision = 5, classes = CLASS.NONE, levels = new int[] {1,0,0,0,0,0,0,0,0} },
+            new Defenses {},
+            new Attacks { baseAtkRate = 1f, atkUsed = 0, attacks = new Attack[1] { new Attack{name = "strike", dmgDice = "1d3", atkRate = 1f} } }
+            },
+            components = new COMPONENT[] {COMPONENT.GLYPH, COMPONENT.CREATURE, COMPONENT.DEFENSES, COMPONENT.ATTACK}
         },
 
     };

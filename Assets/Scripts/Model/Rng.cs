@@ -1,12 +1,18 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using UnityEngine;
 
 public class Rng
 {
     protected int seed;
     protected System.Random rand;
+
+    public static string allDicePattern = @"(([0-9]*)d([0-9]*))";
+    public static string numbersPattern = @"(([0-9]*)*([0-9]*))";
+    public static Regex parseDiceList = new Regex(allDicePattern);
+    public static Regex parseDice = new Regex(numbersPattern);
     public Rng(int seed)
     {
         this.seed = seed;
@@ -64,5 +70,25 @@ public class Rng
     {
         int roll = this.rngC(1, 100);
         return (roll <= chance);
+    }
+
+    public int roll(string dice)
+    {
+        int total = 0;
+        
+        MatchCollection diceList = parseDiceList.Matches(dice);
+        for (int i = 0; i < diceList.Count; i++)
+        {
+            MatchCollection diceAmounts = parseDice.Matches(diceList[i].Value);
+            int q = int.Parse(diceAmounts[0].Value);
+            int s = int.Parse(diceAmounts[2].Value);
+            for (; q > 0; q--)
+            {
+                int roll = rngC(1, s);
+                total += roll;
+            }
+        }
+
+        return total;
     }
 }

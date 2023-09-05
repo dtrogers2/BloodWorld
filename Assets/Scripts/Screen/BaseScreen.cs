@@ -59,20 +59,20 @@ public class BaseScreen : IScreen
         if (ENTITY.has(game.playerId, COMPONENT.CREATURE))
         {
             Creature c = (Creature)ComponentManager.get(COMPONENT.CREATURE).data[game.playerId];
-            playerCost = c.actionPoints;
+            playerCost = c.AP;
         }
         if (ENTITY.has(me, COMPONENT.CREATURE))
         {
             Creature c = (Creature)ComponentManager.get(COMPONENT.CREATURE).data[me];
-            c.actionPoints += -playerCost;
+            c.AP += -playerCost;
             IAI ai = game.ai;
-            if (ai != null && c.actionPoints > 0)
+            if (ai != null && c.AP > 0)
             {
-                while (c.actionPoints > 0)
+                while (c.AP > 0)
                 {
                     float newCost = 0.0f;
                     ai.turn(me, tgt, game, out newCost);
-                    c.actionPoints -= newCost;
+                    c.AP -= newCost;
                 }
             }
         }
@@ -90,8 +90,8 @@ public class BaseScreen : IScreen
         if (ENTITY.has(game.playerId, COMPONENT.CREATURE))
         {
             Creature c = (Creature)ComponentManager.get(COMPONENT.CREATURE).data[game.playerId];
-            StainSystem.update(-c.actionPoints, game);
-            c.actionPoints = 0f;
+            StainSystem.update(-c.AP, game);
+            c.AP = 0f;
         }
     }
     public void handleMsgs(IStack s)

@@ -33,7 +33,7 @@ public class MoveCmd : CmdBase
         if (ENTITY.has(me, COMPONENT.CREATURE))
         {
             Creature meC = (Creature)ComponentManager.get(COMPONENT.CREATURE).data[me];
-            actionCost = meC.moveRate;
+            actionCost = 30 / meC.moveSpeed;
 
         }
 

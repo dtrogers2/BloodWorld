@@ -11,6 +11,9 @@ public enum STAIN
     BLOOD = 1 << 2,
     OIL = 1 << 3,
     SOOT = 1 << 4,
+    SLIME = 1 << 5,
+    RUST = 1 << 6,
+    DUST = 1 << 7,
 
     
 }

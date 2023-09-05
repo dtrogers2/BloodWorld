@@ -43,11 +43,17 @@ public class DrawScreen
                 string bg = outside.background;
                 if (game.world.getCellFlags(w, game, out uint cell))
                 {
+                    int max = 10;
+                    if (ENTITY.has(game.playerId, COMPONENT.CREATURE))
+                    {
+                        Creature ply = (Creature)ComponentManager.get(COMPONENT.CREATURE).data[game.playerId];
+                        max = ply.vision;
+                    }
                     uint entity = cell >> Enum.GetNames(typeof(CELLFLAG)).Length;
                     if (ENTITY.has(game.playerId, COMPONENT.POSITION))
                     {
                         Position p = (Position)ComponentManager.get(COMPONENT.POSITION).data[game.playerId];
-                        bool canSee = Visbility.lineTo(new Vector3Int(p.x, p.y), w, game, true);
+                        bool canSee = Visbility.lineTo(new Vector3Int(p.x, p.y), w, game, true) && Vector3Int.Distance(new Vector3Int(p.x, p.y), w) <= max;
                         if (canSee)
                         {
                             //Set seen flag
@@ -100,11 +106,18 @@ public class DrawScreen
         {
             
             Creature player = (Creature)ComponentManager.get(COMPONENT.CREATURE).data[game.playerId];
-
+            string hpString = "";
+            string acString = "";
+            if (ENTITY.has(game.playerId, COMPONENT.DEFENSES))
+            {
+                Defenses d = (Defenses)ComponentManager.get(COMPONENT.DEFENSES).data[game.playerId];
+                hpString = $"{d.hp}/{d.hpMax}";
+                acString = $"{d.AC}";
+            }
             string name = extend(player.name, term);
-            string health = extend($"Health: {player.hp}/{player.hpMax}", term);
-            string magic = extend("Magic: ", term);
-            string ac = extend("AC: ", term); string str = extend("Str: ", term);
+            string health = extend($"Health: {hpString}", term);
+            string magic = extend("Spell Slots: ", term);
+            string ac = extend($"AC: {acString}", term); string str = extend("Str: ", term);
             string ev = extend("EV: ", term); string intelligence = extend("Int: ", term);
             string sh = extend("AC: ", term); string dex = extend("Dex: ", term);
             string lvl = extend("XL: ", term); string place = extend("Place: ", term);
@@ -156,13 +169,17 @@ public class DrawScreen
     {
         MsgLog log = game.log;
         if (log == null) return;
-        for (int i = 0, y = 21; y < term.dim.y; y++, i++)
+        int cursorX = 0;
+        for (int i = log.archive.Count - 1, y = term.dim.y - 1; y > 21 && i >= 0; y--, i--)
         {
-            if (log.archive.Count > i)
+            for (int j = 0; j < log.archive[i].msgs.Count; j++)
             {
-                string s = extend(log.archive[i], term);
-                term.txt(0, y, s, ColorHex.Gray, ColorHex.Black);
+                string baseS = (j == 0 ? "_" : "") + log.archive[i].msgs[j].text;
+                string s = extend(baseS, term);
+                term.txt(cursorX, y, s, log.archive[i].msgs[j].color, ColorHex.Black);
+                cursorX += baseS.Length;
             }
+            cursorX = 0;
         }
     }
 

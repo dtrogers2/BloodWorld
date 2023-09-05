@@ -20,7 +20,7 @@ public class GameScreen : BaseScreen
             if (ENTITY.has(game.playerId, COMPONENT.CREATURE))
             {
                 Creature player = (Creature)ComponentManager.get(COMPONENT.CREATURE).data[game.playerId];
-                player.actionPoints -= actionCost;
+                player.AP -= actionCost;
                 game.time += Mathf.Abs(actionCost);
                 npcTurns(stack);
             }
