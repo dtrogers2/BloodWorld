@@ -29,21 +29,21 @@ public class HealthAdj
 
     public static void initHD(uint id, IGame game)
     {
-        string hdString = "";
+        string hdString = "1d8";
         if (ENTITY.has(id, COMPONENT.CREATURE))
         {
             Creature c = (Creature)ComponentManager.get(COMPONENT.CREATURE).data[id];
             Defenses d = (Defenses)ComponentManager.get(COMPONENT.DEFENSES).data[id];
 
-            hdString += $"{c.levels[0]}d4 "; // NONE
-            hdString += $"{c.levels[1]}d8 "; // MONSTER
-            hdString += $"{c.levels[2]}d8 "; // FIGHTER
-            hdString += $"{c.levels[3]}d4 "; // MAGICIAN
-            hdString += $"{c.levels[4]}d6 "; // CLERIC
-            hdString += $"{c.levels[5]}d4 "; // THIEF
-            hdString += $"{c.levels[6]}d6 "; // ELF
-            hdString += $"{c.levels[7]}d8 "; // DWARF
-            hdString += $"{c.levels[8]}d6 "; // HALFLING
+            //hdString += $"{c.levels[0]}d4 "; // NONE
+            //hdString += $"{c.levels[1]}d8 "; // MONSTER
+            //hdString += $"{c.levels[2]}d8 "; // FIGHTER
+            //hdString += $"{c.levels[3]}d4 "; // MAGICIAN
+            //hdString += $"{c.levels[4]}d6 "; // CLERIC
+            //hdString += $"{c.levels[5]}d4 "; // THIEF
+            //hdString += $"{c.levels[6]}d6 "; // ELF
+            //hdString += $"{c.levels[7]}d8 "; // DWARF
+            //hdString += $"{c.levels[8]}d6 "; // HALFLING
 
             //insert constitution adjustment here or something
 

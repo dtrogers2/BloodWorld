@@ -1,9 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Xml.Serialization;
 using UnityEngine;
 
-public enum MONTYPE
+public enum MON
 {
+   [XmlEnum("MON.ERROR")]
    ERROR, 
    ANDROID_APEX,
    ANDROID,
@@ -20,6 +22,7 @@ public enum MONTYPE
    GORGON_GREATER,
    GORGON,
    HAEMOPHAGE,
+   [XmlEnum("MON.HUMAN")]
    HUMAN,
    INEXPLICABLE,
    IMP,

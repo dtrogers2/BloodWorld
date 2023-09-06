@@ -22,7 +22,7 @@ public static class StainSystem
                 }
                 else
                 {
-                    ENTITY.subscribe(cellEntity, new Stain { stainflags = s.stainflags, amount = 5, isPool = false }, COMPONENT.STAIN);
+                    ENTITY.subscribe(cellEntity, new Stain { stainflags = s.stainflags, amount = 5, isPool = false });
                 }
             }
         }
@@ -38,14 +38,14 @@ public static class StainSystem
                     eC = g.c;
                 }
                 uint newId = EntityManager.create();
-                ENTITY.subscribe(newId, new object[3] { new Glyph { c = eC, color = ColorHex.Blue }, new Position { x = position.x, y = position.y, z = position.z }, new Stain { stainflags = s.stainflags, amount = 5, isPool = false } }, new COMPONENT[3] { COMPONENT.GLYPH, COMPONENT.POSITION, COMPONENT.STAIN });
+                ENTITY.subscribe(newId, new object[3] { new Glyph { c = eC, color = ColorHex.Blue }, new Position { x = position.x, y = position.y, z = position.z }, new Stain { stainflags = s.stainflags, amount = 5, isPool = false } });
                 game.world.addEntity(newId, game);
             }
             else
             if (!(Env.isEnv(cellEnt) && ENTITY.has(cellEnt, COMPONENT.STAIN)))
             {
                 uint newId = EntityManager.create();
-                ENTITY.subscribe(newId, new object[3] { new Glyph { c = '~', color = ColorHex.Blue }, new Position { x = position.x, y = position.y, z = position.z }, new Stain { stainflags = s.stainflags, amount = 5, isPool = false } }, new COMPONENT[3] { COMPONENT.GLYPH, COMPONENT.POSITION, COMPONENT.STAIN });
+                ENTITY.subscribe(newId, new object[3] { new Glyph { c = '~', color = ColorHex.Blue }, new Position { x = position.x, y = position.y, z = position.z }, new Stain { stainflags = s.stainflags, amount = 5, isPool = false } });
                 game.world.addEntity(newId, game);
             }
         }
@@ -72,7 +72,7 @@ public static class StainSystem
                     }
                     else
                     {
-                        ENTITY.subscribe(entity, new object[1] { new Stain { stainflags = s.stainflags, isPool = false, amount = 10 } }, COMPONENT.STAIN);
+                        ENTITY.subscribe(entity, new object[1] { new Stain { stainflags = s.stainflags, isPool = false, amount = 10 } });
                     }
                 }
             }

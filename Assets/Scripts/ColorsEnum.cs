@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Xml.Serialization;
 using UnityEngine;
 
 
@@ -26,21 +27,37 @@ White = 0xF2F2F2,
 }
 public readonly struct ColorHex
 {
+    [XmlEnum("ColorHex.Black")]
     public const string Black = "#0c0c0c";
+    [XmlEnum("ColorHex.RedDark")]
     public const string RedDark = "#c50f1f";
+    [XmlEnum("ColorHex.GreenDark")]
     public const string GreenDark = "#13a10e";
+    [XmlEnum("ColorHex.YellowDark")]
     public const string YellowDark = "#c19c00";
+    [XmlEnum("ColorHex.BlueDark")]
     public const string BlueDark = "#0037da";
+    [XmlEnum("ColorHex.MagentaDark")]
     public const string MagentaDark = "#881798";
+    [XmlEnum("ColorHex.CyanDark")]
     public const string CyanDark = "#3a96dd";
+    [XmlEnum("ColorHex.Gray")]
     public const string Gray = "#cccccc";
+    [XmlEnum("ColorHex.GrayDark")]
     public const string GrayDark = "#767676";
+    [XmlEnum("ColorHex.Red")]
     public const string Red = "#e74856";
+    [XmlEnum("ColorHex.Green")]
     public const string Green = "#16c60c";
+    [XmlEnum("ColorHex.Yellow")]
     public const string Yellow = "#f9f1a5";
+    [XmlEnum("ColorHex.Blue")]
     public const string Blue = "#3b78ff";
+    [XmlEnum("ColorHex.Magenta")]
     public const string Magenta = "#b4009e";
+    [XmlEnum("ColorHex.Cyan")]
     public const string Cyan = "#61d6d6";
+    [XmlEnum("ColorHex.White")]
     public const string White = "#f2f2f2";
 }
 

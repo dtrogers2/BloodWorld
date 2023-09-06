@@ -108,7 +108,7 @@ public class Region : IRegion
             if (otherId != eId && otherId != 0)
             {
                 CellStack o = new CellStack { entity = otherId };
-                ENTITY.subscribe(eId, o, COMPONENT.CELLSTACK);
+                ENTITY.subscribe(eId, o);
             }
             setCellEntity(eId, pos);
 
@@ -152,10 +152,23 @@ public enum REGIONFLAGS: uint
     NONE = 0,
     OPEN = 1,
     CLOSED = 1 << 1,
-    SETTLEMENT = 1 << 2,
-    WASTELAND = 1 << 3,
-    MOUNDS = 1 << 4,
-    CANYON = 1 << 5,
+    SURFACE = 1 << 2,
+    DUNGEON = 1 << 3,
+    BADLANDS = 1 << 4,
+    HILLS = 1 << 4,
+    MOUNTAINS = 1 << 4,
+    CITY = 1 << 5,
+    GRASSLANDS = 1<< 6,
+    DESERT = 1 << 7,
+    FOREST = 1 << 8,
+    JUNGLE = 1 << 9,
+    LAKE = 1 << 10,
+    RIVER = 1 << 10,
+    OCEAN = 1 << 11,
+    SETTLED = 1 << 12,
+    SWAMP = 1 << 13,
+    LAIR = 1 << 14,
+    STRONGHOLD = 1 << 15
 }
 
 public enum EXITS: int

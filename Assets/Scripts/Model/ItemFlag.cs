@@ -22,4 +22,5 @@ public enum ITEMFLAG : uint
     CURSED = 1 << 14,
     TREASURE = 1 << 15,
     IDENTIFIED = 1 << 16,
+    EXPERIENCE = 1 << 17,
 }

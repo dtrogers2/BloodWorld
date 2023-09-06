@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ArrayOfMonsterentry xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <monsterentry>
+    <mid>MON.ERROR</mid>
+    <data>
+      <anyType xsi:type="Glyph">
+        <c>69</c>
+        <color>#e74856</color>
+      </anyType>
+      <anyType xsi:type="Creature">
+        <name>Error</name>
+        <moveSpeed>30</moveSpeed>
+        <AP>0</AP>
+        <vision>8</vision>
+        <exp>
+          <int>0</int>
+          <int>0</int>
+          <int>0</int>
+          <int>0</int>
+        </exp>
+      </anyType>
+    </data>
+  </monsterentry>
+  <monsterentry>
+    <mid>MON.HUMAN</mid>
+    <data>
+      <anyType xsi:type="Glyph">
+        <c>64</c>
+        <color>#f2f2f2</color>
+      </anyType>
+      <anyType xsi:type="Creature">
+        <name>Human</name>
+        <moveSpeed>30</moveSpeed>
+        <AP>0</AP>
+        <vision>8</vision>
+        <exp>
+          <int>0</int>
+          <int>0</int>
+          <int>0</int>
+          <int>0</int>
+        </exp>
+      </anyType>
+      <anyType xsi:type="Defenses">
+        <HD>1d4</HD>
+        <hpMax>0</hpMax>
+        <hp>0</hp>
+        <AC>9</AC>
+        <immunities>NONE</immunities>
+      </anyType>
+      <anyType xsi:type="Attacks">
+        <baseAtkRate>1</baseAtkRate>
+        <attacks>
+          <Attack>
+            <name>strike</name>
+            <dmgDice>1d3</dmgDice>
+            <atkRate>1</atkRate>
+          </Attack>
+        </attacks>
+        <atkUsed>0</atkUsed>
+      </anyType>
+    </data>
+  </monsterentry>
+</ArrayOfMonsterentry>

@@ -37,6 +37,7 @@ public class Build : IBuild
         //ENTITY.subscribe(wallId, wallGlyph, COMPONENT.GLYPH);
         //floorId = EntityManager.create();
         //ENTITY.subscribe(floorId, floorGlyph, COMPONENT.GLYPH);
+        MonData.init();
     }
     public IAI makeAI()
     {
@@ -82,8 +83,8 @@ public class Build : IBuild
                     Position p = new Position { x = posWorld.x, y = posWorld.y, z = posWorld.z };
                     //Creature c = new Creature { name = MONTYPE.GetName(typeof(MONTYPE), entry.mid), hpMax = entry.avg_hp, hp = entry.avg_hp, moveRate = entry.moveRate, attackRate = entry.attackRate, actionPoints = 0f };
                     uint creatureId = EntityManager.create();
-                    ENTITY.subscribe(creatureId, entry.data, entry.components);
-                    ENTITY.subscribe(creatureId, p, COMPONENT.POSITION);
+                    ENTITY.subscribe(creatureId, entry.data);
+                    ENTITY.subscribe(creatureId, p);
 
                     addNPC(creatureId, map);
                 }
@@ -133,11 +134,11 @@ public class Build : IBuild
         }
         Glyph g = new Glyph { c = '@', color = ColorHex.White };
         Position p = new Position { x = x, y = y, z = 0 };
-        Creature c = new Creature { name = "Player", moveSpeed = 30, AP = 0f, vision = 8, classes = CLASS.NONE, levels = new int[] { 5, 0, 3, 0, 0, 0, 0, 0, 0 } };
+        Creature c = new Creature { name = "Player", moveSpeed = 30, AP = 0f, vision = 8, exp = new int[] { 4, 0, 0, 0 } };
         Defenses d = new Defenses { };
         Attacks a = new Attacks { baseAtkRate = 1f, atkUsed = 0, attacks = new Attack[1] { new Attack { name = "strike", dmgDice = "1d3", atkRate = 1f } } };
         uint player = EntityManager.create();
-        ENTITY.subscribe(player, new object[] { g, p, c, d, a}, new COMPONENT[] { COMPONENT.GLYPH, COMPONENT.POSITION, COMPONENT.CREATURE, COMPONENT.DEFENSES, COMPONENT.ATTACK });
+        ENTITY.subscribe(player, new object[] { g, p, c, d, a});
         game.playerId = player;
         HealthAdj.initHD(game.playerId, game);
         game.world.addEntity(game.playerId, game);

@@ -47,22 +47,24 @@ public static class EntityManager
 
 public struct ENTITY
 {
-    public static void subscribe(uint id, object data, COMPONENT component)
+    public static void subscribe(uint id, object[] data)
     {
+        for (int i = 0; i < data.Length; i++)
+        {
+            subscribe(id, data[i]);
+        }
+    }
+
+    public static void subscribe(uint id, object data)
+    {
+        string componentName = data.GetType().Name.ToUpper();
+        COMPONENT component = (COMPONENT) Enum.Parse(typeof(COMPONENT), componentName);
         uint eBits = EntityManager.entities[id];
-        uint newSet = bitSet(eBits, (uint) component);
+        uint newSet = bitSet(eBits, (uint)component);
         EntityManager.entities[id] = newSet;
         int index = Array.IndexOf(Enum.GetValues(component.GetType()), component);
         ComponentManager.COMPONENTS[index].data[id] = data;
         ComponentManager.COMPONENTS[index].entities.Add(id);
-    }
-    public static void subscribe(uint id, object[] data, params COMPONENT[] components)
-    {
-        if (data.Length != components.Length) { throw new Exception($"subscribe() data length differs from components length!!"); }
-        for (int i = 0; i < components.Length; i++)
-        {
-            subscribe(id, data[i], components[i]);
-        }
     }
 
     public static void unsubscribe(uint id, COMPONENT component)

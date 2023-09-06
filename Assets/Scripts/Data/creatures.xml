@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ArrayOfMonsterentry xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <monsterentry>
+    <mid>MON.ERROR</mid>
+    <data>
+      <anyType xsi:type="Glyph">
+        <c>69</c>
+        <color>#e74856</color>
+      </anyType>
+      <anyType xsi:type="Creature">
+        <name>Error</name>
+      </anyType>
+    </data>
+  </monsterentry>
+  <monsterentry>
+    <mid>MON.HUMAN</mid>
+    <data>
+      <anyType xsi:type="Glyph">
+        <c>64</c>
+        <color>#f2f2f2</color>
+      </anyType>
+      <anyType xsi:type="Creature">
+        <name>Human</name>
+      </anyType>
+      <anyType xsi:type="Defenses">
+        <HD>1d4</HD>
+      </anyType>
+      <anyType xsi:type="Attacks">
+        <baseAtkRate>1</baseAtkRate>
+        <attacks>
+          <Attack>
+            <name>strike</name>
+            <dmgDice>1d3</dmgDice>
+            <atkRate>1</atkRate>
+          </Attack>
+        </attacks>
+      </anyType>
+    </data>
+  </monsterentry>
+</ArrayOfMonsterentry>

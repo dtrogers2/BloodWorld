@@ -1,30 +1,32 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using static UnityEngine.EventSystems.EventTrigger;
 
+using System;
+using System.Diagnostics;
+using System.IO;
+using System.Xml;
+using System.Xml.Linq;
+using System.Xml.Serialization;
 
 public class MonData
 {
-    public static monsterentry[] entries = new monsterentry[]
+
+    public static void init()
     {
-        new monsterentry { mid = MONTYPE.ERROR, data = new object[] {
-            new Glyph { c = 'E', color = ColorHex.Red },
-            new Creature { name = "Error", AP = 0f, moveSpeed = 0, vision = 5} }
-            , components = new COMPONENT[2] {COMPONENT.GLYPH, COMPONENT.CREATURE}
-        },
-        new monsterentry { mid = MONTYPE.HUMAN, data = new object[] {
-            new Glyph { c = '@', color = ColorHex.White },
-            new Creature { name = "Human", AP = 0f, moveSpeed = 30, vision = 5, classes = CLASS.NONE, levels = new int[] {1,0,0,0,0,0,0,0,0} },
-            new Defenses {},
-            new Attacks { baseAtkRate = 1f, atkUsed = 0, attacks = new Attack[1] { new Attack{name = "strike", dmgDice = "1d3", atkRate = 1f} } }
-            },
-            components = new COMPONENT[] {COMPONENT.GLYPH, COMPONENT.CREATURE, COMPONENT.DEFENSES, COMPONENT.ATTACK}
-        },
+        Type[] types = new Type[] { typeof(Glyph), typeof(Creature), typeof(Defenses), typeof(Attacks), typeof(Attack) };
+        XmlSerializer serializer = new XmlSerializer(typeof(monsterentry[]), types);
+        TextReader reader = new StreamReader(".\\Assets\\Scripts\\Data\\creatures.xml");
+        monsterentry[] e = (monsterentry[]) serializer.Deserialize(reader);
+        entries = new monsterentry[e.Length];
+        for (int i = 0; i < e.Length; i++)
+        {
+            entries[i] = e[i];
+        }
+        reader.Close();
 
-    };
+    }
 
-    public static monsterentry GetMonsterEntry(MONTYPE id)
+    public static monsterentry[] entries;
+
+    public static monsterentry GetMonsterEntry(MON id)
     {
         foreach (monsterentry entry in entries)
         {
@@ -38,7 +40,6 @@ public class MonData
 
 public struct monsterentry
 {
-    public MONTYPE mid;
+    public MON mid;
     public object[] data;
-    public COMPONENT[] components;
 }
