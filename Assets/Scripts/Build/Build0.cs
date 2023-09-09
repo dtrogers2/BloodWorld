@@ -78,12 +78,9 @@ public class Build : IBuild
                     Vector3Int posWorld = new Vector3Int(x + (map.dim.x * map.regionPos.x), y + (map.dim.y * map.regionPos.y), map.regionPos.z);
                     int roll = r.rngC(1, MonData.entries.Length);
                     monsterentry entry = MonData.entries[roll];
-
-                    //Glyph g = new Glyph { c = entry.basechar, color = entry.color };
                     Position p = new Position { x = posWorld.x, y = posWorld.y, z = posWorld.z };
-                    //Creature c = new Creature { name = MONTYPE.GetName(typeof(MONTYPE), entry.mid), hpMax = entry.avg_hp, hp = entry.avg_hp, moveRate = entry.moveRate, attackRate = entry.attackRate, actionPoints = 0f };
                     uint creatureId = EntityManager.create();
-                    ENTITY.subscribe(creatureId, entry.data);
+                    ENTITY.subscribe(creatureId, entry.components);
                     ENTITY.subscribe(creatureId, p);
 
                     addNPC(creatureId, map);
@@ -132,7 +129,7 @@ public class Build : IBuild
             }
 
         }
-        Glyph g = new Glyph { c = '@', color = ColorHex.White };
+        Glyph g = new Glyph { c = '@', color = COLOR.White };
         Position p = new Position { x = x, y = y, z = 0 };
         Creature c = new Creature { name = "Player", moveSpeed = 30, AP = 0f, vision = 8, exp = new int[] { 4, 0, 0, 0 } };
         Defenses d = new Defenses { };

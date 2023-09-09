@@ -39,8 +39,8 @@ public class DrawScreen
             for (t.x = 0, w.x = viewPortStart.x; w.x < viewPortEnd.x; w.x++, t.x++)
             {
                 char c = outside.c;
-                string fg = outside.foreground;
-                string bg = outside.background;
+                COLOR fg = outside.foreground;
+                COLOR bg = outside.background;
                 if (game.world.getCellFlags(w, game, out uint cell))
                 {
                     int max = 10;
@@ -73,7 +73,7 @@ public class DrawScreen
                                 {
                                     Glyph g = (Glyph)ComponentManager.get(COMPONENT.GLYPH).data[entity];
                                     c = g.c;
-                                    fg = ColorHex.GrayDark;
+                                    fg = COLOR.GrayDark;
                                 } else
                                 {
                                     bool hasNext = true;
@@ -87,7 +87,7 @@ public class DrawScreen
                                                 hasNext = false;
                                                 Glyph g = (Glyph)ComponentManager.get(COMPONENT.GLYPH).data[entity];
                                                 c = g.c;
-                                                fg = ColorHex.GrayDark;
+                                                fg = COLOR.GrayDark;
                                             }
                                         }
                                     }
@@ -124,29 +124,29 @@ public class DrawScreen
             string noise = extend("Noise: ", term); string time = extend($"Time: {game.time}", term);
             string weapon = extend("a) ", term);
             string ranged = extend("Ranged: ", term);
-            term.txt(36, 0, name, ColorHex.Yellow, ColorHex.Black);
+            term.txt(36, 0, name, COLOR.Yellow, COLOR.Black);
             
-            term.txt(36, 2, health, ColorHex.YellowDark, ColorHex.Black);
-            term.txt(36, 3, magic, ColorHex.YellowDark, ColorHex.Black);
+            term.txt(36, 2, health, COLOR.YellowDark, COLOR.Black);
+            term.txt(36, 3, magic, COLOR.YellowDark, COLOR.Black);
 
-            term.txt(36, 4, ac, ColorHex.YellowDark, ColorHex.Black);
-            term.txt(55, 4, str, ColorHex.YellowDark, ColorHex.Black);
+            term.txt(36, 4, ac, COLOR.YellowDark, COLOR.Black);
+            term.txt(55, 4, str, COLOR.YellowDark, COLOR.Black);
 
-            term.txt(36, 5, ev, ColorHex.YellowDark, ColorHex.Black);
-            term.txt(55, 5, intelligence, ColorHex.YellowDark, ColorHex.Black);
+            term.txt(36, 5, ev, COLOR.YellowDark, COLOR.Black);
+            term.txt(55, 5, intelligence, COLOR.YellowDark, COLOR.Black);
 
-            term.txt(36, 6, sh, ColorHex.YellowDark, ColorHex.Black);
-            term.txt(55, 6, dex, ColorHex.YellowDark, ColorHex.Black);
+            term.txt(36, 6, sh, COLOR.YellowDark, COLOR.Black);
+            term.txt(55, 6, dex, COLOR.YellowDark, COLOR.Black);
 
-            term.txt(36, 7, lvl, ColorHex.YellowDark, ColorHex.Black);
-            term.txt(55, 7, place, ColorHex.YellowDark, ColorHex.Black);
+            term.txt(36, 7, lvl, COLOR.YellowDark, COLOR.Black);
+            term.txt(55, 7, place, COLOR.YellowDark, COLOR.Black);
 
-            term.txt(36, 8, noise, ColorHex.YellowDark, ColorHex.Black);
-            term.txt(55, 8, time, ColorHex.YellowDark, ColorHex.Black);
+            term.txt(36, 8, noise, COLOR.YellowDark, COLOR.Black);
+            term.txt(55, 8, time, COLOR.YellowDark, COLOR.Black);
 
-            term.txt(36, 9, weapon, ColorHex.YellowDark, ColorHex.Black);
+            term.txt(36, 9, weapon, COLOR.YellowDark, COLOR.Black);
 
-            term.txt(36, 10, ranged, ColorHex.YellowDark, ColorHex.Black);
+            term.txt(36, 10, ranged, COLOR.YellowDark, COLOR.Black);
         }
         Vector3Int position = Vector3Int.zero;
         if (ENTITY.has(game.playerId, COMPONENT.POSITION))
@@ -157,7 +157,7 @@ public class DrawScreen
             position.z = p.z;
             Vector3Int regionPos = game.world.regionPosition(position);
             string race = extend($"({position.x}, {position.y}, {position.z}) ({regionPos.x}, {regionPos.y}, {regionPos.z})", term);
-            term.txt(36, 1, race, ColorHex.Yellow, ColorHex.Black);
+            term.txt(36, 1, race, COLOR.Yellow, COLOR.Black);
         }
     }
     public static void drawMapPlayer(ITerm term, Vector3Int viewPos, IGame game)
@@ -176,7 +176,7 @@ public class DrawScreen
             {
                 string baseS = (j == 0 ? "_" : "") + log.archive[i].msgs[j].text;
                 string s = extend(baseS, term);
-                term.txt(cursorX, y, s, log.archive[i].msgs[j].color, ColorHex.Black);
+                term.txt(cursorX, y, s, log.archive[i].msgs[j].color, COLOR.Black);
                 cursorX += baseS.Length;
             }
             cursorX = 0;
@@ -189,5 +189,5 @@ public class DrawScreen
         string mask = new string(' ', dim.x);
         return s + mask.Substring(0, dim.x - s.Length);
     }
-    public static TermChar outside = new TermChar { background = ColorHex.Black, c = ' ', foreground = ColorHex.GrayDark};
+    public static TermChar outside = new TermChar { background = COLOR.Black, c = ' ', foreground = COLOR.GrayDark};
 }

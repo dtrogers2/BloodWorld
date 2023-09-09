@@ -1,8 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 
-public class Item
+public class Item : Component
 {
     public ITEM item = ITEM.Error;
     public ITEMFLAG flags = ITEMFLAG.NONE;

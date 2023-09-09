@@ -1,26 +1,16 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using System.Text;
-using Unity.VisualScripting;
-using Unity.VisualScripting.Dependencies.NCalc;
 using UnityEngine;
-using UnityEngine.Assertions;
-using UnityEngine.UIElements;
-using UnityEngine.WSA;
-using static UnityEditorInternal.ReorderableList;
 using ColorUtility = UnityEngine.ColorUtility;
 
 public interface ITerm
 {
     Vector2Int dim { get; }
     TermChar[,] tpoint { get; }
-    void txt(Vector2Int position, string s, string foreground, string background);
-    void at(Vector2Int position, char c, string foreground, string background);
+    void txt(Vector2Int position, string s, COLOR foreground, COLOR background);
+    void at(Vector2Int position, char c, COLOR foreground, COLOR background);
 
-    void txt(int x, int y, string s, string foreground, string background);
-    void at(int x, int y, char c, string foreground, string background);
+    void txt(int x, int y, string s, COLOR foreground, COLOR background);
+    void at(int x, int y, char c, COLOR foreground, COLOR background);
     void clear();
     void init();
 }
@@ -37,12 +27,12 @@ public class Term : ITerm
         {
             for (int x = 0; x < dim.x; x++)
             {
-                this.tpoint[x, y] = new TermChar { foreground = ColorHex.Black, background = ColorHex.Black, c = '?'};
+                this.tpoint[x, y] = new TermChar { foreground = COLOR.Black, background = COLOR.Black, c = '?'};
             }
         }
     }
 
-     public void txt(Vector2Int position, string s, string foreground, string background)
+     public void txt(Vector2Int position, string s, COLOR foreground, COLOR background)
     {
         char[] chars = s.ToCharArray();
         for (int x = 0; x < s.Length; x++)
@@ -51,7 +41,7 @@ public class Term : ITerm
         }
     }
 
-    virtual public void at(Vector2Int position, char c, string foreground, string background)
+    virtual public void at(Vector2Int position, char c, COLOR foreground, COLOR background)
     {
         if (position.x >= 0 && position.y >= 0 && position.x < this.dim.x && position.y < this.dim.y)
         {
@@ -61,7 +51,7 @@ public class Term : ITerm
         }
     }
 
-     public void txt(int x, int y, string s, string foreground, string background)
+     public void txt(int x, int y, string s, COLOR foreground, COLOR background)
     {
         char[] chars = s.ToCharArray();
         for (int c = 0; c < s.Length; c++)
@@ -70,7 +60,7 @@ public class Term : ITerm
         }
     }
 
-    virtual public void at(int x, int y, char c, string foreground, string background)
+    virtual public void at(int x, int y, char c, COLOR foreground, COLOR background)
     {
         if (x >= 0 && y >= 0 && x < this.dim.x && y < this.dim.y)
         {
@@ -86,8 +76,8 @@ public class Term : ITerm
         {
             for (int x = 0; x < dim.x; x++)
             {
-                this.tpoint[x, y].foreground = ColorHex.Black;
-                this.tpoint[x, y].background = ColorHex.Black;
+                this.tpoint[x, y].foreground = COLOR.Black;
+                this.tpoint[x, y].background = COLOR.Black;
                 this.tpoint[x, y].c = '?';
             }
         }
@@ -118,7 +108,7 @@ public class GTerm : Term
         this.init();
     }
 
-    public override void at(Vector2Int position, char c, string foreground, string background)
+    public override void at(Vector2Int position, char c, COLOR foreground, COLOR background)
     {
         base.at(position, c, foreground, background);
 
@@ -132,7 +122,7 @@ public class GTerm : Term
         }
     }
 
-    public override void at(int x, int y, char c, string foreground, string background)
+    public override void at(int x, int y, char c, COLOR foreground, COLOR background)
     {
         base.at(x, y, c, foreground, background);
 
@@ -188,6 +178,17 @@ public class GTerm : Term
 
     }
 
+
+    public static Color HexToColor(COLOR c)
+    {
+        Color newCol;
+        string hexString = Convert.ToString((int)c, 16);
+        int missingNo = 6 - hexString.Length;
+        string hex = "#" + new string('0', missingNo) + hexString;
+        ColorUtility.TryParseHtmlString(hex, out newCol);
+        return newCol;
+
+    }
     public static GTerm StockTerm(Sprite[] sheet)
     {
         return new GTerm(GTerm.StockDim(), sheet);
@@ -199,9 +200,9 @@ public class TestTerm
     public static void test(ITerm term)
     {
         term.init();
-        term.at(0, 0, 'c', ColorHex.White, ColorHex.Black);
+        term.at(0, 0, 'c', COLOR.White, COLOR.Black);
 
-        term.txt(1, 1, "Testing...", ColorHex.Blue, ColorHex.YellowDark);
+        term.txt(1, 1, "Testing...", COLOR.Blue, COLOR.YellowDark);
 
     }
 
@@ -216,12 +217,12 @@ public class TestTerm
                 int nc = (n % 26) + 'a';
                 char c = (char)nc;
                 string bg = '#' + Convert.ToString(((n + 0) % 16),16) + Convert.ToString(((n + 5) % 16),16) + Convert.ToString(((n + 10) % 16),16);
-                term.at(x, y, c, ColorHex.White, bg);
+                term.at(x, y, c, COLOR.White, COLOR.Black);
             }
         }
 
-        term.txt(2, 1, "##.##", ColorHex.White, ColorHex.Black);
-        term.txt(2, 2, "#@.k!", ColorHex.White, ColorHex.Black);
-        term.txt(2, 3, str, ColorHex.Yellow, ColorHex.RedDark);
+        term.txt(2, 1, "##.##", COLOR.White, COLOR.Black);
+        term.txt(2, 2, "#@.k!", COLOR.White, COLOR.Black);
+        term.txt(2, 3, str, COLOR.Yellow, COLOR.RedDark);
     }
 }

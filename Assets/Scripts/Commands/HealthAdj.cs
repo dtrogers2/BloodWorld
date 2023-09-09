@@ -79,7 +79,7 @@ public class HealthAdj
             Creature c = (Creature)ComponentManager.get(COMPONENT.CREATURE).data[id];
             if (playerRelated)
             {
-                Msg s = new Msg { color = ColorHex.Red, text = $"{c.name}({id}) dies." };
+                Msg s = new Msg { color = COLOR.Red, text = $"{c.name}({id}) dies." };
                 game.msg(s);
             }
             if (id != game.playerId)

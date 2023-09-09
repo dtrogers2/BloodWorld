@@ -1,10 +1,8 @@
-
 using System;
-using System.Diagnostics;
+using UnityEngine;
 using System.IO;
-using System.Xml;
-using System.Xml.Linq;
 using System.Xml.Serialization;
+
 
 public class MonData
 {
@@ -24,7 +22,7 @@ public class MonData
 
     }
 
-    public static monsterentry[] entries;
+    public static monsterentry[] entries = new monsterentry[0];
 
     public static monsterentry GetMonsterEntry(MON id)
     {
@@ -41,5 +39,5 @@ public class MonData
 public struct monsterentry
 {
     public MON mid;
-    public object[] data;
+    public Component[] components;
 }

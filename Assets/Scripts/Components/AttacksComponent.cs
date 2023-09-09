@@ -1,20 +1,12 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Xml.Serialization;
-using UnityEngine;
-
-[XmlInclude(typeof(Attacks))]
-public class Attacks
+public class Attacks : Component
 {
     //[XmlElement(typeof(float))]
-    public float baseAtkRate;
+    public float baseAtkRate = 1f;
     //[XmlElement(typeof(Attack[]))]
-    public Attack[] attacks;
+    public Attack[] attacks = new Attack[] { new Attack { atkRate = 1f, dmgDice = "1d6", name = "strike" } };
     //[XmlElement(typeof(uint))]
-    public uint atkUsed;
+    public uint atkUsed = 0;
 }
-
-[XmlInclude(typeof(Attack))]
 public struct Attack
 {
     //[XmlElement(typeof(string))]

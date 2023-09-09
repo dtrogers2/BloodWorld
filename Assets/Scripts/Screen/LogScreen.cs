@@ -33,7 +33,7 @@ public class LogScreen : BaseScreen
             {
                 string baseS = (j == 0 ? "_" : "") + msgLog[i].msgs[j].text;
                 string s = DrawScreen.extend(baseS, term);
-                term.txt(cursorX, y, s, msgLog[i].msgs[j].color, ColorHex.Black);
+                term.txt(cursorX, y, s, msgLog[i].msgs[j].color, COLOR.Black);
                 cursorX += baseS.Length;
             }
             cursorX = 0;

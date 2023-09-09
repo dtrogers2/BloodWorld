@@ -2,39 +2,46 @@
 <ArrayOfMonsterentry xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <monsterentry>
     <mid>MON.ERROR</mid>
-    <data>
-      <anyType xsi:type="Glyph">
+    <components>
+      <Component xsi:type="Glyph">
         <c>69</c>
-        <color>#e74856</color>
-      </anyType>
-      <anyType xsi:type="Creature">
+        <color>COLOR.RED</color>
+      </Component>
+      <Component xsi:type="Creature">
         <name>Error</name>
-      </anyType>
-    </data>
+      </Component>
+    </components>
   </monsterentry>
   <monsterentry>
-    <mid>MON.HUMAN</mid>
-    <data>
-      <anyType xsi:type="Glyph">
+    <mid>MON.NORMAL_HUMAN</mid>
+    <components>
+      <Component xsi:type="Glyph">
         <c>64</c>
-        <color>#f2f2f2</color>
-      </anyType>
-      <anyType xsi:type="Creature">
+        <color>COLOR.WHITE</color>
+      </Component>
+      <Component xsi:type="Creature">
         <name>Human</name>
-      </anyType>
-      <anyType xsi:type="Defenses">
-        <HD>1d4</HD>
-      </anyType>
-      <anyType xsi:type="Attacks">
-        <baseAtkRate>1</baseAtkRate>
-        <attacks>
-          <Attack>
-            <name>strike</name>
-            <dmgDice>1d3</dmgDice>
-            <atkRate>1</atkRate>
-          </Attack>
-        </attacks>
-      </anyType>
-    </data>
+      </Component>
+      <Component xsi:type="Defenses">
+      </Component>
+      <Component xsi:type="Attacks">
+      </Component>
+    </components>
+  </monsterentry>
+    <monsterentry>
+    <mid>MON.ACOLYTE</mid>
+    <components>
+      <Component xsi:type="Glyph">
+        <c>64</c>
+        <color>COLOR.GREENDARK</color>
+      </Component>
+      <Component xsi:type="Creature">
+        <name>Acolyte</name>
+      </Component>
+      <Component xsi:type="Defenses">
+      </Component>
+      <Component xsi:type="Attacks">
+      </Component>
+    </components>
   </monsterentry>
 </ArrayOfMonsterentry>

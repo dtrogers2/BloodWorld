@@ -5,25 +5,40 @@ using System.Xml.Serialization;
 using UnityEngine;
 
 
-public enum ColorInt: int
+public enum COLOR: uint
 {
-Black = 0x0C0C0C,
-RedDark = 0xC50F1F,
-GreenDark = 0x13A10E,
-YellowDark = 0xC19C00,
-BlueDark = 0x0037DA,
-MagentaDark = 0x881798,
-CyanDark = 0x3A96DD,
-Gray = 0xCCCCCC,
-GrayDark = 0x767676,
-Red = 0xE74856,
-Green = 0x16C60C,
-Yellow = 0xF9F1A5,
-Blue = 0x3B78FF,
-Magenta = 0xB4009E,
-Cyan = 0x61D6D6,
-White = 0xF2F2F2,
-
+    [XmlEnum("COLOR.BLACK")]
+    Black = 0x0C0C0C,
+    [XmlEnum("COLOR.REDDARK")]
+    RedDark = 0xC50F1F,
+    [XmlEnum("COLOR.GREENDARK")]
+    GreenDark = 0x13A10E,
+    [XmlEnum("COLOR.YELLOWDARK")]
+    YellowDark = 0xC19C00,
+    [XmlEnum("COLOR.BLUEDARK")]
+    BlueDark = 0x0037DA,
+    [XmlEnum("COLOR.MAGENTADARK")]
+    MagentaDark = 0x881798,
+    [XmlEnum("COLOR.CYANDARK")]
+    CyanDark = 0x3A96DD,
+    [XmlEnum("COLOR.GRAY")]
+    Gray = 0xCCCCCC,
+    [XmlEnum("COLOR.GRAYDARK")]
+    GrayDark = 0x767676,
+    [XmlEnum("COLOR.RED")]
+    Red = 0xE74856,
+    [XmlEnum("COLOR.GREEN")]
+    Green = 0x16C60C,
+    [XmlEnum("COLOR.YELLOW")]
+    Yellow = 0xF9F1A5,
+    [XmlEnum("COLOR.BLUE")]
+    Blue = 0x3B78FF,
+    [XmlEnum("COLOR.MAGENTA")]
+    Magenta = 0xB4009E,
+    [XmlEnum("COLOR.CYAN")]
+    Cyan = 0x61D6D6,
+    [XmlEnum("COLOR.WHITE")]
+    White = 0xF2F2F2,
 }
 public readonly struct ColorHex
 {

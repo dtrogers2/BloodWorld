@@ -46,7 +46,7 @@ public class MsgLog
     }
     public Msg top()
     {
-        return this.empty() ? new Msg { color = ColorHex.White, text = ""} : this.queue.msgs[0];
+        return this.empty() ? new Msg { color = COLOR.White, text = ""} : this.queue.msgs[0];
     }
     public bool queuedMsgs()
     {
@@ -66,7 +66,7 @@ public class MsgLog
 
 public struct Msg
 {
-    public string color;
+    public COLOR color;
     public string text;
 }
 

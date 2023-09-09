@@ -4,9 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
-using static UnityEditor.PlayerSettings;
-using static UnityEngine.RuleTile.TilingRuleOutput;
-
 public class AIBase : IAI
 {
     public bool turn(uint me, uint tgt, IGame game, out float actionCost)

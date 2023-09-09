@@ -4,7 +4,7 @@ using UnityEngine;
 
 public struct TermChar 
 {
-    public string foreground;
-    public string background;
+    public COLOR foreground;
+    public COLOR background;
     public char c;
 }

@@ -14,7 +14,7 @@ public class DummyScreen : IScreen
 
     public void draw(ITerm term)
     {
-        term.txt(1, 1, "Press a key!", ColorHex.Cyan, ColorHex.BlueDark);
+        term.txt(1, 1, "Press a key!", COLOR.Cyan, COLOR.BlueDark);
     }
 
     public void onKey(KeyCode keycode, IStack stack)

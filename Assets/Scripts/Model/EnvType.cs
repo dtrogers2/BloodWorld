@@ -30,26 +30,26 @@ public class Env
     public static uint[] envEntities = new uint[Enum.GetNames(typeof(ENV)).Length];
     public static enventry[] entries = new enventry[]
     {
-        new enventry { eid = ENV.EMPTY, data = new object [1] {new Glyph { c = ' ', color = ColorHex.Black } }},
+        new enventry { eid = ENV.EMPTY, data = new object [1] {new Glyph { c = ' ', color = COLOR.Black } }},
         // 5+ neighbor wall
-        new enventry { eid = ENV.WALL, data = new object [1] {new Glyph { c = (char) 219, color = ColorHex.White } }},
-        new enventry { eid = ENV.FLOOR, data = new object [1] {new Glyph { c = '.', color = ColorHex.White }}},
+        new enventry { eid = ENV.WALL, data = new object [1] {new Glyph { c = (char) 219, color = COLOR.White } }},
+        new enventry { eid = ENV.FLOOR, data = new object [1] {new Glyph { c = '.', color = COLOR.White }}},
         // 2 neighbor walls
-        new enventry { eid = ENV.WALL_NS, data = new object [1] {new Glyph { c = (char) 205, color = ColorHex.White } }},
-        new enventry { eid = ENV.WALL_WE, data = new object [1]  {new Glyph { c = (char) 186, color = ColorHex.White }}},
-        new enventry { eid = ENV.WALL_NW, data = new object [1] {new Glyph { c = (char) 201, color = ColorHex.White }}},
-        new enventry { eid = ENV.WALL_NE, data = new object [1]  {new Glyph { c = (char) 187, color = ColorHex.White }}},
-        new enventry { eid = ENV.WALL_SW, data = new object [1] {new Glyph { c = (char) 200, color = ColorHex.White }}},
-        new enventry { eid = ENV.WALL_SE, data = new object [1]  {new Glyph { c = (char) 188, color = ColorHex.White }}},
+        new enventry { eid = ENV.WALL_NS, data = new object [1] {new Glyph { c = (char) 205, color = COLOR.White } }},
+        new enventry { eid = ENV.WALL_WE, data = new object [1]  {new Glyph { c = (char) 186, color = COLOR.White }}},
+        new enventry { eid = ENV.WALL_NW, data = new object [1] {new Glyph { c = (char) 201, color = COLOR.White }}},
+        new enventry { eid = ENV.WALL_NE, data = new object [1]  {new Glyph { c = (char) 187, color = COLOR.White }}},
+        new enventry { eid = ENV.WALL_SW, data = new object [1] {new Glyph { c = (char) 200, color = COLOR.White }}},
+        new enventry { eid = ENV.WALL_SE, data = new object [1]  {new Glyph { c = (char) 188, color = COLOR.White }}},
         // 3 neighbor walls
-        new enventry { eid = ENV.WALL_N, data = new object [1] {new Glyph { c = (char) 203, color = ColorHex.White }}},
-        new enventry { eid = ENV.WALL_S, data = new object [1] {new Glyph { c = (char) 202, color = ColorHex.White }}},
-        new enventry { eid = ENV.WALL_E, data = new object [1] {new Glyph { c = (char) 204, color = ColorHex.White }}},
-        new enventry { eid = ENV.WALL_W, data = new object [1] {new Glyph { c = (char) 185, color = ColorHex.White }}},
+        new enventry { eid = ENV.WALL_N, data = new object [1] {new Glyph { c = (char) 203, color = COLOR.White }}},
+        new enventry { eid = ENV.WALL_S, data = new object [1] {new Glyph { c = (char) 202, color = COLOR.White }}},
+        new enventry { eid = ENV.WALL_E, data = new object [1] {new Glyph { c = (char) 204, color = COLOR.White }}},
+        new enventry { eid = ENV.WALL_W, data = new object [1] {new Glyph { c = (char) 185, color = COLOR.White }}},
         // 4 neighbor wall
-        new enventry { eid = ENV.WALL_C, data = new object [1] {new Glyph { c = (char) 206, color = ColorHex.White } }},
-        new enventry { eid = ENV.WATER, data = new object[2]{ new Glyph {c = (char) 247, color = ColorHex.Blue}, new Stain { stainflags = (uint) STAIN.WATER, isPool = true, amount = 100} }},
-        new enventry { eid = ENV.PATH, data = new object [1] {new Glyph { c = ',', color = ColorHex.White }}},
+        new enventry { eid = ENV.WALL_C, data = new object [1] {new Glyph { c = (char) 206, color = COLOR.White } }},
+        new enventry { eid = ENV.WATER, data = new object[2]{ new Glyph {c = (char) 247, color = COLOR.Blue}, new Stain { stainflags = (uint) STAIN.WATER, isPool = true, amount = 100} }},
+        new enventry { eid = ENV.PATH, data = new object [1] {new Glyph { c = ',', color = COLOR.White }}},
     };
     public static void init()
     {

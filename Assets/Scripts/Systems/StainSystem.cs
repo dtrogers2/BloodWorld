@@ -38,14 +38,14 @@ public static class StainSystem
                     eC = g.c;
                 }
                 uint newId = EntityManager.create();
-                ENTITY.subscribe(newId, new object[3] { new Glyph { c = eC, color = ColorHex.Blue }, new Position { x = position.x, y = position.y, z = position.z }, new Stain { stainflags = s.stainflags, amount = 5, isPool = false } });
+                ENTITY.subscribe(newId, new object[3] { new Glyph { c = eC, color = COLOR.Blue }, new Position { x = position.x, y = position.y, z = position.z }, new Stain { stainflags = s.stainflags, amount = 5, isPool = false } });
                 game.world.addEntity(newId, game);
             }
             else
             if (!(Env.isEnv(cellEnt) && ENTITY.has(cellEnt, COMPONENT.STAIN)))
             {
                 uint newId = EntityManager.create();
-                ENTITY.subscribe(newId, new object[3] { new Glyph { c = '~', color = ColorHex.Blue }, new Position { x = position.x, y = position.y, z = position.z }, new Stain { stainflags = s.stainflags, amount = 5, isPool = false } });
+                ENTITY.subscribe(newId, new object[3] { new Glyph { c = '~', color = COLOR.Blue }, new Position { x = position.x, y = position.y, z = position.z }, new Stain { stainflags = s.stainflags, amount = 5, isPool = false } });
                 game.world.addEntity(newId, game);
             }
         }
