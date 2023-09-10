@@ -1,9 +1,9 @@
 public class Attacks : Component
 {
     //[XmlElement(typeof(float))]
-    public float baseAtkRate = 1f;
+    public float baseAtkDly = 1f;
     //[XmlElement(typeof(Attack[]))]
-    public Attack[] attacks = new Attack[] { new Attack { atkRate = 1f, dmgDice = "1d6", name = "strike" } };
+    public Attack[] attacks = new Attack[] { new Attack { atkDly = 1f, dmgDice = "1d6", name = "strike" } };
     //[XmlElement(typeof(uint))]
     public uint atkUsed = 0;
 }
@@ -15,5 +15,5 @@ public struct Attack
     public string dmgDice;
     //public EFFECT[] effects;
     //[XmlElement(typeof(float))]
-    public float atkRate;
+    public float atkDly;
 }

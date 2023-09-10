@@ -5,46 +5,46 @@ using System.Xml.Serialization;
 using UnityEngine;
 
 [Flags]
-public enum EGO : uint
+public enum FAC : uint
 {
-    [XmlEnum("EGO.NONE")]
+    [XmlEnum("FAC.NONE")]
     NONE = 0,
-    [XmlEnum("EGO.LAW")]
+    [XmlEnum("FAC.LAW")]
     LAW = 1,
-    [XmlEnum("EGO.NEUTRAL")]
+    [XmlEnum("FAC.NEUTRAL")]
     NEUTRAL = 1 << 1,
-    [XmlEnum("EGO.CHAOTIC")]
+    [XmlEnum("FAC.CHAOTIC")]
     CHAOS = 1 << 2,
-    [XmlEnum("EGO.HUMAN")]
+    [XmlEnum("FAC.HUMAN")]
     HUMAN = 1 << 4,
-    [XmlEnum("EGO.DWARF")]
+    [XmlEnum("FAC.DWARF")]
     DWARF = 1 << 5,
-    [XmlEnum("EGO.ELF")]
+    [XmlEnum("FAC.ELF")]
     ELF = 1 << 6,
-    [XmlEnum("EGO.HALFLING")]
+    [XmlEnum("FAC.HALFLING")]
     HALFLING = 1 << 7,
-    [XmlEnum("EGO.GOBLIN")]
+    [XmlEnum("FAC.GOBLIN")]
     GOBLIN = 1 << 8,
-    [XmlEnum("EGO.ORC")]
+    [XmlEnum("FAC.ORC")]
     ORC = 1 << 9,
-    [XmlEnum("EGO.UNDEAD")]
+    [XmlEnum("FAC.UNDEAD")]
     UNDEAD = 1 << 10,
-    [XmlEnum("EGO.INSECT")]
+    [XmlEnum("FAC.INSECT")]
     INSECT = 1 << 11,
-    [XmlEnum("EGO.BEAST")]
+    [XmlEnum("FAC.BEAST")]
     BEAST = 1 << 12,
-    [XmlEnum("EGO.DRAGON")]
+    [XmlEnum("FAC.DRAGON")]
     DRAGON = 1 << 13,
-    [XmlEnum("EGO.ELEMENTAL")]
+    [XmlEnum("FAC.ELEMENTAL")]
     ELEMENTAL = 1 << 14,
-    [XmlEnum("EGO.DEMON")]
+    [XmlEnum("FAC.DEMON")]
     DEMON = 1 << 15,
-    [XmlEnum("EGO.GIANT")]
+    [XmlEnum("FAC.GIANT")]
     GIANT = 1 << 16,
-    [XmlEnum("EGO.MONSTROSITY")]
+    [XmlEnum("FAC.MONSTROSITY")]
     MONSTROSITY = 1 << 17,
-    [XmlEnum("EGO.OOZE")]
+    [XmlEnum("FAC.OOZE")]
     OOZE = 1 << 18,
-    [XmlEnum("EGO.PLANT")]
+    [XmlEnum("FAC.PLANT")]
     PLANT = 1 << 19,
 }

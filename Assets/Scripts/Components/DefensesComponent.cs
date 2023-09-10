@@ -4,6 +4,6 @@ public class Defenses : Component
     public string HD = "1d8";
     public int hpMax = 0;
     public int hp = 0;
-    public short AC = 9;
+    public short AC = 0;
     public STATUS immunities = STATUS.NONE;
 }

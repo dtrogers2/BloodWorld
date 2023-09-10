@@ -1,106 +1,284 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using Unity.VisualScripting;
 using UnityEngine;
+
 public class AIBase : IAI
 {
-    public bool turn(uint me, uint tgt, IGame game, out float actionCost)
+    public bool turn(uint me, List<uint> nearCreatures, IGame game, out float actionCost)
     {
+
         ICmd cmd;
-        Vector3Int dir = Vector3Int.zero;
-        Position p1 = (Position) ComponentManager.get(COMPONENT.POSITION).data[me];
-        Position p2 = (Position) ComponentManager.get(COMPONENT.POSITION).data[tgt];
-        Creature c = (Creature)ComponentManager.get(COMPONENT.CREATURE).data[me];
+        
+        AI ai = (AI)ComponentManager.get(COMPONENT.AI).data[me];
+        // Choose state based on what is happening
+        ai.state = handleState(game, me, ai, nearCreatures);
+        // switch based on state
+        switch (ai.state)
+        {
+            case STATE.CHASE: cmd = handleChase(game, me, ai); break;
+            case STATE.IDLE: cmd = handleIdle(game, me); break;
+            case STATE.REST: cmd = handleRest(game, me); break;
+            case STATE.INVESTIGATE: cmd = handleInvestigate(game, me, ai); break;
+            case STATE.WANDER: cmd = handleWander(game, me, ai); break;
+            case STATE.FOLLOW: cmd = handleFollow(game, me, ai); break;
+            default: cmd = handleIdle(game, me); break;
+        }
+        return cmd.turn(out actionCost);
+    }
+
+    public STATE handleState(IGame game, uint me, AI ai, List<uint> nearCreatures)
+    {
+
+        // Clear targets and leaders
+        if (!ENTITY.has(ai.target, COMPONENT.CREATURE)) ai.target = 0;
+        if (!ENTITY.has(ai.leader, COMPONENT.CREATURE)) ai.leader = 0;
+        // if I have a target, chase that target
+        if (ai.target != 0)
+        {
+             return STATE.CHASE;
+        }
+        // If I have a leader
+        if (ai.leader != 0)
+        {
+            // See if the leader has a target, if so then target the leaders target
+            if (ENTITY.has(ai.leader, COMPONENT.AI))
+            {
+                AI aiL = (AI)ComponentManager.get(COMPONENT.AI).data[ai.leader];
+                if (aiL.target != 0 && ENTITY.has(aiL.target, COMPONENT.CREATURE))
+                {
+                    ai.target = aiL.target;
+                    ai.memory = ai.memoryMax;
+                    return STATE.CHASE;
+                }
+            }
+            // Otherwise follow the leader
+            return STATE.FOLLOW;
+        }
+
+        // if there is no target and no leader, see if there is a hostile visible
+        Position p1 = (Position)ComponentManager.get(COMPONENT.POSITION).data[me];
+        Creature c1 = (Creature)ComponentManager.get(COMPONENT.CREATURE).data[me];
+        if (ENTITY.has(me, COMPONENT.EGO))
+        {
+            Ego e1 = (Ego)ComponentManager.get(COMPONENT.EGO).data[me];
+            uint nearestHostile = 0;
+            float nearestDistance = float.MaxValue;
+            for (int i = 0; i < nearCreatures.Count; i++)
+            {
+                if (me == nearCreatures[i]) continue;
+                if (!ENTITY.has(nearCreatures[i], COMPONENT.EGO)) continue;
+                Position p2 = (Position)ComponentManager.get(COMPONENT.POSITION).data[nearCreatures[i]];
+                Vector3Int mePos = new Vector3Int(p1.x, p1.y, p1.z);
+                Vector3Int tgtPos = new Vector3Int(p2.x, p2.y, p2.z);
+                float distance = Vector3Int.Distance(mePos, tgtPos);
+                if (distance > c1.vision || !Visbility.lineTo(mePos, tgtPos, game, true) ) continue;
+                Ego e2 = (Ego)ComponentManager.get(COMPONENT.EGO).data[nearCreatures[i]];
+                for (int u = 0; u < Enum.GetNames(typeof(FAC)).Length; u++)
+                {
+                    if (e1.factions.HasFlag((FAC)(1 << u)))
+                    {
+                        int index = Array.IndexOf(Enum.GetValues(e2.factions.GetType()), (FAC)(1 << u));
+                        if (e2.reputations[index] < -250 && distance < nearestDistance)
+                        {
+                            nearestHostile = nearCreatures[i];
+                            nearestDistance = distance;
+                        }
+                    }
+                }
+
+            }
+
+            if (nearestHostile != 0)
+            {
+                ai.target = nearestHostile;
+                ai.memory = ai.memoryMax;
+                return STATE.CHASE;
+            }
+        }
+
+
+        // There is no current target, no leader, and no visible target.
+        //TODO investigate noises
+        // If already wandering, check to see if it has arrived at its destination
+        if (ai.state == STATE.WANDER)
+        {
+            Position p2 = ai.pos;
+            Vector3Int mePos = new Vector3Int(p1.x, p1.y, p1.z);
+            Vector3Int tgtPos = new Vector3Int(p2.x, p2.y, p2.z);
+            float tgtDistance = Vector3Int.Distance(mePos, tgtPos);
+            if (tgtDistance < 2)
+            {
+                return STATE.IDLE;
+            } else
+            {
+                return STATE.WANDER;
+            }
+        }
+        // Roll to see if it is going to wander around
+        
+        if (game.rng.pct(16) && ai.state != STATE.WANDER)
+        {
+
+            int x = p1.x - 14 + game.rng.rng(28);
+            int y = p1.y - 14 + game.rng.rng(28);
+            if (game.world.getCellFlags(new Vector3Int(x, y), game, out uint cellFlag)) {
+                if (!ENTITY.bitHas(cellFlag, (uint) CELLFLAG.BLOCKED))
+                {
+                    
+                    ai.pos.x = x;
+                    ai.pos.y = y;
+                    ai.memory = ai.memoryMax;
+                    return STATE.WANDER;
+                }
+            }
+        }
+        // Nothing to do, become idle
+        return STATE.IDLE;
+    }
+
+    public ICmd handleIdle(IGame game, uint me)
+    {
+        return new WaitCmd(me, game);
+    }
+
+    public ICmd handleRest(IGame game, uint me)
+    {
+        return new WaitCmd(me, game);
+    }
+
+    public ICmd handleWander(IGame game, uint me, AI ai)
+    {
+        Position p1 = (Position)ComponentManager.get(COMPONENT.POSITION).data[me];
+        Position p2 = ai.pos;
         Vector3Int mePos = new Vector3Int(p1.x, p1.y, p1.z);
         Vector3Int tgtPos = new Vector3Int(p2.x, p2.y, p2.z);
         float tgtDistance = Vector3Int.Distance(mePos, tgtPos);
-        if (tgtDistance <= c.vision)
+        Vector3Int dir = new Vector3Int(Math.Sign(0f + tgtPos.x - mePos.x), Math.Sign(tgtPos.y - mePos.y), mePos.z); ;
+
+        if (Visbility.lineTo(mePos, tgtPos, game, false))
         {
-            if (tgtDistance < 2)
+                dir = new Vector3Int(Math.Sign(0f + tgtPos.x - mePos.x), Math.Sign(tgtPos.y - mePos.y), mePos.z);
+        }
+        else
+        {
+             Stack<Vector3Int> path = new Stack<Vector3Int>();
+             if (pathNext(game, mePos, tgtPos, out path))
+             {
+                dir = path.Pop();
+             } else
+             {
+                ai.state = STATE.IDLE;
+             }
+        }
+        return new BumpCmd(new Vector3Int(dir.x, dir.y, 0), me, game);
+    }
+
+    public ICmd handleInvestigate(IGame game, uint me, AI ai)
+    {
+        Position p1 = (Position)ComponentManager.get(COMPONENT.POSITION).data[me];
+        Position p2 = ai.pos;
+        Vector3Int mePos = new Vector3Int(p1.x, p1.y, p1.z);
+        Vector3Int tgtPos = new Vector3Int(p2.x, p2.y, p2.z);
+        float tgtDistance = Vector3Int.Distance(mePos, tgtPos);
+        Vector3Int dir = new Vector3Int(Math.Sign(0f + tgtPos.x - mePos.x), Math.Sign(tgtPos.y - mePos.y), mePos.z); ;
+
+        // See if there is an visible line to target, if so path towards it
+        if (!Visbility.lineTo(mePos, tgtPos, game, true) && ai.memory > 0)
+        {
+            Stack<Vector3Int> path = new Stack<Vector3Int>();
+            if (pathNext(game, mePos, tgtPos, out path))
+                {
+                    dir = path.Pop();
+                }
+            ai.memory--;
+            return new BumpCmd(new Vector3Int(dir.x, dir.y, 0), me, game);
+        } 
+        {
+            // Either memory ran out, or it can see the position it was trying to investigate, so become idle
+            ai.state = STATE.IDLE;
+        }
+        return new WaitCmd(me, game);
+        
+    }
+
+    public ICmd handleFollow(IGame game, uint me, AI ai)
+    {
+        Position p1 = (Position)ComponentManager.get(COMPONENT.POSITION).data[me];
+        Position p2 = (Position)ComponentManager.get(COMPONENT.POSITION).data[ai.leader];
+        Vector3Int mePos = new Vector3Int(p1.x, p1.y, p1.z);
+        Vector3Int tgtPos = new Vector3Int(p2.x, p2.y, p2.z);
+        float tgtDistance = Vector3Int.Distance(mePos, tgtPos);
+        Vector3Int dir = Vector3Int.zero;
+
+        // See if there is an visible line to target, if so path towards it
+        if (Visbility.lineTo(mePos, tgtPos, game, true) && tgtDistance >= 2)
+        {
+            if (Visbility.lineTo(mePos, tgtPos, game, false))
             {
                 dir = new Vector3Int(Math.Sign(0f + tgtPos.x - mePos.x), Math.Sign(tgtPos.y - mePos.y), mePos.z);
-                // Move directly to target
             }
-            else if (tgtDistance >= 2)
+            else
             {
-                if (Visbility.lineTo(mePos, tgtPos, game, false))
+                Stack<Vector3Int> path = new Stack<Vector3Int>();
+                if (pathNext(game, mePos, tgtPos, out path))
                 {
-                    // if it has unobstructed line, move directly towards target
-                    dir = new Vector3Int(Math.Sign(0f + tgtPos.x - mePos.x), Math.Sign(tgtPos.y - mePos.y), mePos.z);
-                }
-                else
-                {
-                    Stack<Vector3Int> path = new Stack<Vector3Int>();
-                    if (pathNext(game, mePos, tgtPos, out path))
-                    {
-                        dir = path.Pop();
-                    }
-                    //dir = new Vector3Int(Math.Sign(0f + tgtPos.x - mePos.x), Math.Sign(tgtPos.y - mePos.y), mePos.z);
-                    // Obstructed line towards target, find a path to the target
-                    /*
-                    if (!ENTITY.has(me, COMPONENT.PATH))
-                    {
-                        
-                        if (pathNext(game, mePos, tgtPos, out path))
-                        {
-                            ENTITY.subscribe(me, new Path { path = path , gScore = path.Count - 1, pathTurns = 0}, COMPONENT.PATH);
-                        }
-                    } 
-
-                    if (ENTITY.has(me, COMPONENT.PATH))
-                    {
-                        Path p = (Path) ComponentManager.get(COMPONENT.PATH).data[me];
-                        if (p.pathTurns > 3)
-                        {
-                            if (pathNext(game, mePos, tgtPos, out path))
-                            {
-                                p.path = path;
-                                p.gScore = path.Count - 1;
-                                p.pathTurns = 0;
-                            }
-                        }
-                        if (p.path.Count > 0)
-                        {
-                           dir = p.path.Pop();
-                            if (game.world.getCellFlags(mePos + dir, game, out uint cellBits)) {
-                                if (ENTITY.bitHas(cellBits, ((uint) CELLFLAG.BLOCKED)))
-                                {
-                                    bool newDir = game.rng.oneIn(1);
-                                    if (newDir) { dir.x = 0; } else { dir.y = 0; }
-                                }
-                            }
-                        }
-
-                        if (p.path.Count == 0) ENTITY.unsubscribe(me, COMPONENT.PATH);
-                    }*/
+                    dir = path.Pop();
                 }
             }
-
-            if (dir != Vector3Int.zero)
-            {
-                cmd = new BumpCmd(new Vector3Int(dir.x, dir.y, 0), me, game);
-            } else
-            {
-                cmd = new WaitCmd(me, game);
-            }
-            
-        } else
-        {
-            cmd = new WaitCmd(me, game);
         }
-        /*
-        if (ENTITY.has(me, COMPONENT.PATH))
+        else if (tgtDistance >= 2)// There is no visible line to the target
         {
-            Path p = (Path)ComponentManager.get(COMPONENT.PATH).data[me];
-            p.pathTurns++;
-            if (p.pathTurns >= p.gScore || p.gScore > Vector3Int.Distance(mePos, tgtPos))
+            Stack<Vector3Int> path = new Stack<Vector3Int>();
+            if (pathNext(game, mePos, tgtPos, out path))
             {
-                ENTITY.unsubscribe(me, COMPONENT.PATH);
+                dir = path.Pop();
             }
-        }*/
-        return cmd.turn(out actionCost);
+        }
+        if (dir != Vector3Int.zero)
+        {
+            return new BumpCmd(new Vector3Int(dir.x, dir.y, 0), me, game);
+        }
+        else
+        {
+            return new WaitCmd(me, game);
+        }
+    }
+
+    public ICmd handleChase(IGame game, uint me, AI ai)
+    {
+        Position p1 = (Position)ComponentManager.get(COMPONENT.POSITION).data[me];
+        Position p2 = (Position)ComponentManager.get(COMPONENT.POSITION).data[ai.target];
+        Vector3Int mePos = new Vector3Int(p1.x, p1.y, p1.z);
+        Vector3Int tgtPos = new Vector3Int(p2.x, p2.y, p2.z);
+        float tgtDistance = Vector3Int.Distance(mePos, tgtPos);
+        Vector3Int dir = new Vector3Int(Math.Sign(0f + tgtPos.x - mePos.x), Math.Sign(tgtPos.y - mePos.y), mePos.z); ;
+
+        // See if there is an visible line to target, if so path towards it
+        if (Visbility.lineTo(mePos, tgtPos, game, true) && tgtDistance >= 2)
+        {
+            if (Visbility.lineTo(mePos, tgtPos, game, false))
+            {
+              dir = new Vector3Int(Math.Sign(0f + tgtPos.x - mePos.x), Math.Sign(tgtPos.y - mePos.y), mePos.z);
+            } else if (tgtDistance < 15)
+            {
+                Stack<Vector3Int> path = new Stack<Vector3Int>();
+                if (pathNext(game, mePos, tgtPos, out path))
+                {
+                    dir = path.Pop();
+                }
+            }
+            ai.memory = ai.memoryMax;
+            
+        } else if (ai.memory > 0 && tgtDistance >= 2 && tgtDistance < 15) // There is no visible line to the target
+        {
+            Stack<Vector3Int> path = new Stack<Vector3Int>();
+            if (pathNext(game, mePos, tgtPos, out path))
+            {
+                dir = path.Pop();
+            }
+            ai.memory--;
+        }
+        return new BumpCmd(new Vector3Int(dir.x, dir.y, 0), me, game);
     }
 
     // Node positions are relative to the start position
@@ -113,6 +291,7 @@ public class AIBase : IAI
         HashSet<Node> closed = new HashSet<Node>();
         // Vector3Int oCenter = new Vector3Int(Mathf.Abs(pos.x - Node.dim.x / 2), Mathf.Abs(pos.y - Node.dim.y / 2), pos.z);
         Node start = nodes[Node.dim.x / 2, Node.dim.y / 2];
+        if (Node.dim.x / 2 + (tgt - pos).x < 0 || Node.dim.x / 2 + (tgt - pos).x >= Node.dim.x || Node.dim.y / 2 + (tgt - pos).y < 0 || Node.dim.y / 2 + (tgt - pos).y >= Node.dim.y) return false;
         Node goal = nodes[Node.dim.x / 2 + (tgt - pos).x, Node.dim.y / 2 + (tgt - pos).y];
         // if (!start.traversable() || !oDest.traversable()) { Debug.Log("start or end not traversible"); return false; }
         open.Add(start);

@@ -1,4 +1,5 @@
 using JetBrains.Annotations;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,7 +10,7 @@ public class Build : IBuild
 {
     public IGame makeGame()
     {
-
+        EntityManager.reset();
         initComponents();
         makeEnv();
         Rng rng = new Rng(42);
@@ -28,15 +29,6 @@ public class Build : IBuild
     public void makeEnv()
     {
         Env.init();
-        //Glyph wallGlyph = new Glyph { c = '#', color = ColorHex.White };
-        //Glyph floorGlyph = new Glyph { c = '.', color = ColorHex.White };
-        //Glyph emptyGlyph = new Glyph { c = ' ', color = ColorHex.Black };
-        //emptyId = EntityManager.create();
-        //ENTITY.subscribe(emptyId, emptyGlyph, COMPONENT.GLYPH);
-        //wallId = EntityManager.create();
-        //ENTITY.subscribe(wallId, wallGlyph, COMPONENT.GLYPH);
-        //floorId = EntityManager.create();
-        //ENTITY.subscribe(floorId, floorGlyph, COMPONENT.GLYPH);
         MonData.init();
     }
     public IAI makeAI()
@@ -79,9 +71,43 @@ public class Build : IBuild
                     int roll = r.rngC(1, MonData.entries.Length);
                     monsterentry entry = MonData.entries[roll];
                     Position p = new Position { x = posWorld.x, y = posWorld.y, z = posWorld.z };
+
                     uint creatureId = EntityManager.create();
                     ENTITY.subscribe(creatureId, entry.components);
                     ENTITY.subscribe(creatureId, p);
+                    ENTITY.subscribe(creatureId, new AI { });
+                    HealthAdj.initHD(creatureId, game);
+                    if (ENTITY.has(creatureId, COMPONENT.EGO))
+                    {
+                        Ego e = (Ego)ComponentManager.get(COMPONENT.EGO).data[creatureId];
+                        int moodRoll = r.roll("2d6");
+                        MOOD mood = (moodRoll >= 12) ? MOOD.FRIENDLY : (moodRoll >= 10) ? MOOD.DOCILE : (moodRoll > 6) ? MOOD.NEUTRAL : MOOD.AGGRESSIVE;
+                        e.mood = mood;
+                        int moodAdj = (mood == MOOD.FRIENDLY) ? 250 : (mood == MOOD.DOCILE) ? 100 : (mood == MOOD.NEUTRAL) ? 0: -250;
+                        for (int i = 0; i < e.reputations.Length; i++)
+                        {
+                            e.reputations[i] += (short) moodAdj;
+
+                        }
+                        // Adjust kinship
+                        for (int i = 0; i < Enum.GetNames(typeof(FAC)).Length; i++)
+                        {
+                            if (e.factions.HasFlag((FAC)(1 << i)))
+                            {
+                                int index = Array.IndexOf(Enum.GetValues(e.factions.GetType()), (FAC) (1 << i));
+                                e.reputations[index] = (short) e.kinship;
+                            }
+                        }
+                        /*
+                        if (ENTITY.has(leaderId, COMPONENT.EGO))
+                        {
+                            Ego eL = (Ego)ComponentManager.get(COMPONENT.EGO).data[leaderId];
+                            for (int i = 0; i < eL.reputations.Length; i++)
+                            {
+                                e.reputations[i] = eL.reputations[i];
+                            }
+                        }*/
+                    }
 
                     addNPC(creatureId, map);
                 }
@@ -132,10 +158,10 @@ public class Build : IBuild
         Glyph g = new Glyph { c = '@', color = COLOR.White };
         Position p = new Position { x = x, y = y, z = 0 };
         Creature c = new Creature { name = "Player", moveSpeed = 30, AP = 0f, vision = 8, exp = new int[] { 4, 0, 0, 0 } };
-        Defenses d = new Defenses { };
-        Attacks a = new Attacks { baseAtkRate = 1f, atkUsed = 0, attacks = new Attack[1] { new Attack { name = "strike", dmgDice = "1d3", atkRate = 1f } } };
+        Defenses d = new Defenses { HD = "1d8", hpMax = 20, hp = 20, AC = 11 };
+        Attacks a = new Attacks { baseAtkDly = 1f, atkUsed = 0, attacks = new Attack[1] { new Attack { name = "strike", dmgDice = "1d6", atkDly = 1f } } };
         uint player = EntityManager.create();
-        ENTITY.subscribe(player, new object[] { g, p, c, d, a});
+        ENTITY.subscribe(player, new object[] { g, p, c, d, a, new Ego { factions = FAC.HUMAN } });
         game.playerId = player;
         HealthAdj.initHD(game.playerId, game);
         game.world.addEntity(game.playerId, game);

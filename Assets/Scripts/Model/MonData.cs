@@ -9,7 +9,7 @@ public class MonData
 
     public static void init()
     {
-        Type[] types = new Type[] { typeof(Glyph), typeof(Creature), typeof(Defenses), typeof(Attacks), typeof(Attack) };
+        Type[] types = new Type[] { typeof(Glyph), typeof(Creature), typeof(Defenses), typeof(Attacks), typeof(Attack), typeof(Ego) };
         XmlSerializer serializer = new XmlSerializer(typeof(monsterentry[]), types);
         TextReader reader = new StreamReader(".\\Assets\\Scripts\\Data\\creatures.xml");
         monsterentry[] e = (monsterentry[]) serializer.Deserialize(reader);

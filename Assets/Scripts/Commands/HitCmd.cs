@@ -8,6 +8,7 @@ using static Unity.Burst.Intrinsics.X86.Avx;
 public class HitCmd : CmdBase
 {
     public uint tgt { get; }
+    public Attack attack { get; set; }
     public HitCmd(uint me, uint tgt, IGame game) : base(me, game)
     {
         this.tgt = tgt;
@@ -15,8 +16,26 @@ public class HitCmd : CmdBase
 
     public override bool exc()
     {
+        
+        // Switch aggro for hit creature
         bool hit = calcHit(game.rng, tgt);
         int dmg = calcDmg(game.rng);
+        if (ENTITY.has(tgt, COMPONENT.AI))
+        {
+            AI aiOther = (AI)ComponentManager.get(COMPONENT.AI).data[tgt];
+            if (aiOther.target != 0)
+            {
+                if (dmg > aiOther.memory)
+                {
+                    aiOther.target = me;
+                    aiOther.memory = dmg;
+                }
+            } else
+            {
+                aiOther.target = me;
+                aiOther.memory = dmg;
+            }
+        }
         
         doDmg(dmg, hit, tgt, game);
         return true;
@@ -26,6 +45,14 @@ public class HitCmd : CmdBase
     {
         // Choose an attack here?
         actionCost = 1.0f;
+        if (ENTITY.has(me, COMPONENT.ATTACKS))
+        {
+            Attacks atks = (Attacks)ComponentManager.get(COMPONENT.ATTACKS).data[me];
+            int ix = game.rng.rng(atks.attacks.Length);
+            attack = atks.attacks[ix];
+            atks.atkUsed = ENTITY.bitSet(atks.atkUsed, (uint) 1 << ix);
+            actionCost = atks.baseAtkDly;
+        }
         return exc();
     }
 
@@ -38,12 +65,12 @@ public class HitCmd : CmdBase
         if (ENTITY.has(me, COMPONENT.CREATURE))
         {
             cSrc = (Creature)ComponentManager.get(COMPONENT.CREATURE).data[me];
-            s += (dmg > 0 && hit) ? $"{cSrc.name}({me}) hits " : $"{cSrc.name}({me}) misses ";
+            s += (dmg > 0 && hit) ? $"{cSrc.name}'s {attack.name} hits " : $"{cSrc.name} misses ";
         }
         if (ENTITY.has(tgt, COMPONENT.CREATURE))
         {
             cTgt = (Creature)ComponentManager.get(COMPONENT.CREATURE).data[tgt];
-            s += (dmg > 0 && hit) ? $"{cTgt.name}({tgt}) for {dmg} damage." : $"{cTgt.name}({tgt}).";
+            s += $"{cTgt.name}.";
         }
         //TODO add Hit Dice component
         Msg m = new Msg { color = (dmg > 0 && hit ) ? COLOR.White: COLOR.GrayDark, text = s};
@@ -78,9 +105,7 @@ public class HitCmd : CmdBase
     {
         int dmg = 0;
         if (ENTITY.has(me, COMPONENT.ATTACKS)) {
-            Attacks a = (Attacks) ComponentManager.get(COMPONENT.ATTACKS).data[me];
-            if (a.attacks.Length > 0)
-                dmg = rng.roll(a.attacks[0].dmgDice);
+            dmg = rng.roll(attack.dmgDice);
         }
         return dmg;
     }

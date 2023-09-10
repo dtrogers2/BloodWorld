@@ -4,6 +4,6 @@ using UnityEngine;
 
 public interface IAI
 {
-    public bool turn(uint me, uint tgt, IGame game, out float actionCost);
+    public bool turn(uint me, List<uint> nearCreatures, IGame game, out float actionCost);
 
 }

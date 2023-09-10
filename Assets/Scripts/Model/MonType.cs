@@ -5,7 +5,7 @@ public enum MON
    ERROR,
     [XmlEnum("MON.ACOLYTE")]
     ACOLYTE,
-    [XmlEnum("MON.APE_WHTIE")]
+    [XmlEnum("MON.APE_WHITE")]
     APE_WHITE,
     [XmlEnum("MON.BANDIT")]
     BANDIT,

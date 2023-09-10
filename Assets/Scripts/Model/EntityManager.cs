@@ -37,6 +37,7 @@ public static class EntityManager
     {
         entities = new uint[ENTITIES_DEFAULT];
         curLength = 0;
+        reuse.Clear();
     }
 }
 

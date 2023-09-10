@@ -5,6 +5,7 @@ using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UIElements;
+using static UnityEngine.EventSystems.EventTrigger;
 
 public class DrawScreen
 {
@@ -32,7 +33,7 @@ public class DrawScreen
         Vector3Int viewPortStart = new Vector3Int(worldPos.x - 16, worldPos.y - 10, worldPos.z);
         Vector3Int viewPortEnd = new Vector3Int(worldPos.x + 17, worldPos.y + 11, worldPos.z);
         TermChar termChar = outside;
-
+        List<uint> nearby = new List<uint>();
         //Draw environment
         for (t.y = 0, w.y = viewPortStart.y; w.y < viewPortEnd.y; w.y++, t.y++)
         {
@@ -50,7 +51,7 @@ public class DrawScreen
                         max = ply.vision;
                     }
                     uint entity = cell >> Enum.GetNames(typeof(CELLFLAG)).Length;
-                    if (ENTITY.has(game.playerId, COMPONENT.POSITION))
+                    if (ENTITY.has(game.playerId, COMPONENT.POSITION) && !(entity == game.playerId))
                     {
                         Position p = (Position)ComponentManager.get(COMPONENT.POSITION).data[game.playerId];
                         bool canSee = Visbility.lineTo(new Vector3Int(p.x, p.y), w, game, true) && Vector3Int.Distance(new Vector3Int(p.x, p.y), w) <= max;
@@ -64,6 +65,11 @@ public class DrawScreen
                                 Glyph g = (Glyph)ComponentManager.get(COMPONENT.GLYPH).data[entity];
                                 c = g.c;
                                 fg = g.color;
+
+                                if (ENTITY.has(entity, COMPONENT.CREATURE) && ENTITY.has(entity, COMPONENT.DEFENSES) && entity != game.playerId)
+                                {
+                                    nearby.Add(entity);
+                                }
                             }
                         } else // Can't see, set the glyph to non-creature on the stack
                         {
@@ -94,9 +100,44 @@ public class DrawScreen
                                 }
                             }
                         }
+                    } else if (entity == game.playerId)
+                    {
+                        c = '@';
+                        fg = COLOR.Black;
+                        bg = COLOR.Gray;
                     }
                 }
                 term.at(t.x, t.y, c, fg, bg);
+            }
+        }
+        renderNear(term, game, nearby);
+    }
+
+    public static void renderNear(ITerm term, IGame game, List<uint> nearby)
+    {
+        // Clear the nearby list
+        for (int i = 11; i < term.dim.y; i++)
+        {
+            string empty = extend(" ", term);
+            term.txt(36, i, empty, COLOR.Black, COLOR.Black);
+        }
+        // Need to figure out a way to stack similar creatures
+        // Limit the number
+        if (nearby.Count <= term.dim.y - 10)
+        {
+            for(int i = 0, y = 11; i < nearby.Count && y < term.dim.y; i++, y++)
+            {
+                int x = 36; // The x offset for drawing the nearby creatures
+                Glyph g = (Glyph)ComponentManager.get(COMPONENT.GLYPH).data[nearby[i]];
+                Defenses d = (Defenses)ComponentManager.get(COMPONENT.DEFENSES).data[nearby[i]];
+                Creature c = (Creature)ComponentManager.get(COMPONENT.CREATURE).data[nearby[i]];
+                // TODO: change color of name based on status effects
+                COLOR col = (d.hp == d.hpMax) ? COLOR.Green : ((float) d.hp / d.hpMax >= .9f) ? COLOR.GreenDark : ((float) d.hp / d.hpMax >= .7f) ? 
+                    COLOR.Yellow : ((float) d.hp / d.hpMax >= .5f) ? COLOR.YellowDark : ((float) d.hp / d.hpMax >= .3f) ? COLOR.Red : ((float) d.hp / d.hpMax >= .1f) ? COLOR.RedDark : COLOR.MagentaDark;
+                term.at(x++, y, g.c, COLOR.White, col);
+                term.txt(++x, y, c.name, COLOR.White, COLOR.Black);
+                x += c.name.Length;
+
             }
         }
     }

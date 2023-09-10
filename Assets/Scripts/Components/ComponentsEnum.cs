@@ -17,4 +17,5 @@ public enum COMPONENT : uint
     ATTACKS = 1 << 6,
     ITEM = 1 << 7,
     EGO = 1 << 8,
+    AI = 1 << 9,
 }
