@@ -71,14 +71,17 @@ public class AIBase : IAI
                 Vector3Int mePos = new Vector3Int(p1.x, p1.y, p1.z);
                 Vector3Int tgtPos = new Vector3Int(p2.x, p2.y, p2.z);
                 float distance = Vector3Int.Distance(mePos, tgtPos);
-                if (distance > c1.vision || !Visbility.lineTo(mePos, tgtPos, game, true) ) continue;
+                int vision = 8;
+                if (ENTITY.has(me, COMPONENT.CREATURE)) { vision = c1.vision; }
+                if (distance > vision || !Visbility.lineTo(mePos, tgtPos, game, true) ) continue;
+                int moodAdj = (e1.mood == MOOD.FRIENDLY) ? 250 : (e1.mood == MOOD.DOCILE) ? 100 : (e1.mood == MOOD.NEUTRAL) ? 0 : -250;
                 Ego e2 = (Ego)ComponentManager.get(COMPONENT.EGO).data[nearCreatures[i]];
                 for (int u = 0; u < Enum.GetNames(typeof(FAC)).Length; u++)
                 {
                     if (e1.factions.HasFlag((FAC)(1 << u)))
                     {
                         int index = Array.IndexOf(Enum.GetValues(e2.factions.GetType()), (FAC)(1 << u));
-                        if (e2.reputations[index] < -250 && distance < nearestDistance)
+                        if (e2.reputations[index] + moodAdj < -250 && distance < nearestDistance)
                         {
                             nearestHostile = nearCreatures[i];
                             nearestDistance = distance;
@@ -115,6 +118,7 @@ public class AIBase : IAI
             }
         }
         // Roll to see if it is going to wander around
+        
         
         if (game.rng.pct(16) && ai.state != STATE.WANDER)
         {
@@ -189,6 +193,7 @@ public class AIBase : IAI
             if (pathNext(game, mePos, tgtPos, out path))
                 {
                     dir = path.Pop();
+                
                 }
             ai.memory--;
             return new BumpCmd(new Vector3Int(dir.x, dir.y, 0), me, game);

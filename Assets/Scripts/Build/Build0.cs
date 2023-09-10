@@ -1,10 +1,6 @@
-using JetBrains.Annotations;
 using System;
-using System.Collections;
-using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
-using static Unity.Burst.Intrinsics.X86;
-using static UnityEngine.EventSystems.EventTrigger;
 
 public class Build : IBuild
 {
@@ -71,9 +67,14 @@ public class Build : IBuild
                     int roll = r.rngC(1, MonData.entries.Length);
                     monsterentry entry = MonData.entries[roll];
                     Position p = new Position { x = posWorld.x, y = posWorld.y, z = posWorld.z };
-
                     uint creatureId = EntityManager.create();
-                    ENTITY.subscribe(creatureId, entry.components);
+                    object[] components = new object[entry.components.Length];
+                    for (int i = 0; i < components.Length; i++)
+                    {
+                        components[i] = entry.components[i].CloneViaSerialization();//entry.components[i].Copy();
+                    }
+                    // ENTITY.subscribe(creatureId, entry.components); Copying the entry components is no good, need to figure out how to deep clone the entry components
+                    ENTITY.subscribe(creatureId, components);
                     ENTITY.subscribe(creatureId, p);
                     ENTITY.subscribe(creatureId, new AI { });
                     HealthAdj.initHD(creatureId, game);
@@ -82,13 +83,8 @@ public class Build : IBuild
                         Ego e = (Ego)ComponentManager.get(COMPONENT.EGO).data[creatureId];
                         int moodRoll = r.roll("2d6");
                         MOOD mood = (moodRoll >= 12) ? MOOD.FRIENDLY : (moodRoll >= 10) ? MOOD.DOCILE : (moodRoll > 6) ? MOOD.NEUTRAL : MOOD.AGGRESSIVE;
+                        
                         e.mood = mood;
-                        int moodAdj = (mood == MOOD.FRIENDLY) ? 250 : (mood == MOOD.DOCILE) ? 100 : (mood == MOOD.NEUTRAL) ? 0: -250;
-                        for (int i = 0; i < e.reputations.Length; i++)
-                        {
-                            e.reputations[i] += (short) moodAdj;
-
-                        }
                         // Adjust kinship
                         for (int i = 0; i < Enum.GetNames(typeof(FAC)).Length; i++)
                         {

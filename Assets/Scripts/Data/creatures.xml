@@ -28,7 +28,6 @@
       </Component>
 	  <Component xsi:type="Ego">
 		<factions>FAC.HUMAN</factions>
-		<kinship>-150</kinship>
 	  </Component>
     </components>
   </monsterentry>
@@ -110,6 +109,7 @@
       </Component>
 	  	  <Component xsi:type="Ego">
 		<factions>FAC.HUMAN</factions>
+		<kinship>-300</kinship>
 	  </Component>
     </components>
   </monsterentry>
@@ -193,6 +193,9 @@
 		</Attack>
 	  </attacks>
       </Component>
+	  <Component xsi:type="Ego">
+		<factions>FAC.BEAST</factions>
+	  </Component>
     </components>
   </monsterentry>
     <monsterentry>

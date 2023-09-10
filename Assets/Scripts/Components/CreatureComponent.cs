@@ -1,4 +1,5 @@
 using System;
+[Serializable]
 public class Creature : Component
 {
     public string name = "None";

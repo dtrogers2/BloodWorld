@@ -5,7 +5,7 @@
     <components>
       <Component xsi:type="Glyph">
         <c>69</c>
-        <color>#e74856</color>
+        <color>COLOR.RED</color>
       </Component>
       <Component xsi:type="Creature">
         <name>Error</name>
@@ -17,7 +17,7 @@
     <components>
       <Component xsi:type="Glyph">
         <c>64</c>
-        <color>#f2f2f2</color>
+        <color>COLOR.WHITE</color>
       </Component>
       <Component xsi:type="Creature">
         <name>Human</name>
@@ -26,6 +26,10 @@
       </Component>
       <Component xsi:type="Attacks">
       </Component>
+	  <Component xsi:type="Ego">
+		<factions>FAC.HUMAN</factions>
+		<kinship>-150</kinship>
+	  </Component>
     </components>
   </monsterentry>
     <monsterentry>
@@ -33,15 +37,194 @@
     <components>
       <Component xsi:type="Glyph">
         <c>64</c>
-        <color>#f2f2f2</color>
+        <color>COLOR.GREENDARK</color>
       </Component>
       <Component xsi:type="Creature">
         <name>Acolyte</name>
       </Component>
       <Component xsi:type="Defenses">
+		<AC>0</AC>
       </Component>
       <Component xsi:type="Attacks">
       </Component>
+		<Component xsi:type="Ego">
+		<factions>FAC.HUMAN</factions>
+	  </Component>
+    </components>
+  </monsterentry>
+    <monsterentry>
+    <mid>MON.APE_WHITE</mid>
+    <components>
+      <Component xsi:type="Glyph">
+        <c>134</c>
+        <color>COLOR.WHITE</color>
+      </Component>
+      <Component xsi:type="Creature">
+        <name>White ape</name>
+      </Component>
+      <Component xsi:type="Defenses">
+	  <HD>4d8</HD>
+	  <AC>13</AC>
+      </Component>
+      <Component xsi:type="Attacks">
+	  <attacks>
+		<Attack>
+			<name>claw</name>
+			<dmgDice>1d4</dmgDice>
+			<atkDly>.5</atkDly>
+		</Attack>
+		<Attack>
+			<name>rock</name>
+			<dmgDice>1d6</dmgDice>
+			<atkDly>1</atkDly>
+		</Attack>
+	  </attacks>
+      </Component>
+	  	  <Component xsi:type="Ego">
+		<factions>FAC.BEAST</factions>
+	  </Component>
+    </components>
+  </monsterentry>
+  <monsterentry>
+    <mid>MON.BANDIT</mid>
+    <components>
+      <Component xsi:type="Glyph">
+        <c>64</c>
+        <color>COLOR.RED</color>
+      </Component>
+      <Component xsi:type="Creature">
+        <name>Bandit</name>
+      </Component>
+      <Component xsi:type="Defenses">
+	  <HD>1d8</HD>
+	  <AC>13</AC>
+      </Component>
+      <Component xsi:type="Attacks">
+	  <attacks>
+		<Attack>
+			<name>weapon</name>
+			<dmgDice>1d6</dmgDice>
+			<atkDly>1</atkDly>
+		</Attack>
+	  </attacks>
+      </Component>
+	  	  <Component xsi:type="Ego">
+		<factions>FAC.HUMAN</factions>
+		<kinship>-300</kinship>
+	  </Component>
+    </components>
+  </monsterentry>
+  <monsterentry>
+    <mid>MON.BASILISK</mid>
+    <components>
+      <Component xsi:type="Glyph">
+        <c>66</c>
+        <color>COLOR.YELLOW</color>
+      </Component>
+      <Component xsi:type="Creature">
+        <name>Basilisk</name>
+      </Component>
+      <Component xsi:type="Defenses">
+	  <HD>6d8</HD>
+	  <AC>15</AC>
+      </Component>
+      <Component xsi:type="Attacks">
+	  <attacks>
+		<Attack>
+			<name>bite</name>
+			<dmgDice>1d10</dmgDice>
+			<atkDly>1</atkDly>
+		</Attack>
+	  </attacks>
+      </Component>
+	  	  <Component xsi:type="Ego">
+		<factions>FAC.MONSTROSITY</factions>
+		<kinship>-100</kinship>
+	  </Component>
+    </components>
+  </monsterentry>
+    <monsterentry>
+    <mid>MON.BAT</mid>
+    <components>
+      <Component xsi:type="Glyph">
+        <c>66</c>
+        <color>COLOR.GRAY</color>
+      </Component>
+      <Component xsi:type="Creature">
+        <name>Bat</name>
+      </Component>
+      <Component xsi:type="Defenses">
+	  <HD>1d1</HD>
+	  <AC>13</AC>
+      </Component>
+      <Component xsi:type="Attacks">
+	  <attacks>
+		<Attack>
+			<name>bite</name>
+			<dmgDice>1d1</dmgDice>
+			<atkDly>1</atkDly>
+		</Attack>
+	  </attacks>
+      </Component>
+	  <Component xsi:type="Ego">
+		<factions>FAC.BEAST</factions>
+	  </Component>
+    </components>
+  </monsterentry>
+    <monsterentry>
+    <mid>MON.BAT_GIANT</mid>
+    <components>
+      <Component xsi:type="Glyph">
+        <c>66</c>
+        <color>COLOR.GRAYDARK</color>
+      </Component>
+      <Component xsi:type="Creature">
+        <name>Giant Bat</name>
+      </Component>
+      <Component xsi:type="Defenses">
+	  <HD>2d8</HD>
+	  <AC>13</AC>
+      </Component>
+      <Component xsi:type="Attacks">
+	  <attacks>
+		<Attack>
+			<name>bite</name>
+			<dmgDice>1d4</dmgDice>
+			<atkDly>1</atkDly>
+		</Attack>
+	  </attacks>
+      </Component>
+	  <Component xsi:type="Ego">
+		<factions>FAC.BEAST</factions>
+	  </Component>
+    </components>
+  </monsterentry>
+    <monsterentry>
+    <mid>MON.BAT_VAMPIRE</mid>
+    <components>
+      <Component xsi:type="Glyph">
+        <c>66</c>
+        <color>COLOR.REDDARK</color>
+      </Component>
+      <Component xsi:type="Creature">
+        <name>Vampire Bat</name>
+      </Component>
+      <Component xsi:type="Defenses">
+	  <HD>2d8</HD>
+	  <AC>13</AC>
+      </Component>
+      <Component xsi:type="Attacks">
+	  <attacks>
+		<Attack>
+			<name>bite</name>
+			<dmgDice>1d10</dmgDice>
+			<atkDly>1</atkDly>
+		</Attack>
+	  </attacks>
+      </Component>
+		<Component xsi:type="Ego">
+		<factions>FAC.BEAST</factions>
+	  </Component>
     </components>
   </monsterentry>
 </ArrayOfMonsterentry>

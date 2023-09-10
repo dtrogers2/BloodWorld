@@ -1,4 +1,6 @@
+using System;
 
+[Serializable]
 public class Position : Component
 {
     public int x;

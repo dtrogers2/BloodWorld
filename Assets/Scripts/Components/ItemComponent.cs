@@ -1,4 +1,6 @@
+using System;
 
+[Serializable]
 public class Item : Component
 {
     public ITEM item = ITEM.Error;

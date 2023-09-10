@@ -1,3 +1,6 @@
+using System;
+
+[Serializable]
 public class Defenses : Component
 {
     //public ushort[] saves = new ushort[5];

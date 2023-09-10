@@ -50,8 +50,7 @@ public class BaseScreen : IScreen
         }
         for (int i = activeCreatures.Count; i > 0; i--)
         {
-            //insert logic to find nearest active creature it cares about
-
+            
             npcTurn(activeCreatures.Pop(), nearCreatures);
         }
         handleMsgs(stack);

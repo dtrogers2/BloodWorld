@@ -1,7 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-
+using UnityEngine;
 public static class EntityManager
 {
     public static uint ENTITIES_DEFAULT = 100000;
@@ -62,6 +62,14 @@ public struct ENTITY
         int index = Array.IndexOf(Enum.GetValues(component.GetType()), component);
         ComponentManager.COMPONENTS[index].data[id] = data;
         ComponentManager.COMPONENTS[index].entities.Add(id);
+    }
+
+    public static void unsubscribeAll(uint id)
+    {
+        for (int i = 0; i < ComponentManager.COMPONENTS.Length - 1; i++)
+        {
+            unsubscribe(id, (COMPONENT) (1 << i));
+        }
     }
 
     public static void unsubscribe(uint id, COMPONENT component)

@@ -1,4 +1,6 @@
+using System;
 
+[Serializable]
 public class Stain : Component
 {
     public uint stainflags;

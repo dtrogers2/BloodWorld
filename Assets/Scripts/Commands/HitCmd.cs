@@ -74,7 +74,7 @@ public class HitCmd : CmdBase
         }
         //TODO add Hit Dice component
         Msg m = new Msg { color = (dmg > 0 && hit ) ? COLOR.White: COLOR.GrayDark, text = s};
-        game.msg(m);
+        if (tgt == game.playerId || me == game.playerId) game.msg(m);
         if (dmg > 0 && hit) HealthAdj.adjust(tgt, -dmg, game, me);
     }
 

@@ -1,3 +1,6 @@
+using System;
+
+[Serializable]
 public class Attacks : Component
 {
     //[XmlElement(typeof(float))]

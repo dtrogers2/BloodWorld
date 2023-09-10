@@ -137,6 +137,11 @@ public class DrawScreen
                 term.at(x++, y, g.c, COLOR.White, col);
                 term.txt(++x, y, c.name, COLOR.White, COLOR.Black);
                 x += c.name.Length;
+                if (ENTITY.has(nearby[i], COMPONENT.EGO))
+                {
+                    Ego e = (Ego)ComponentManager.get(COMPONENT.EGO).data[nearby[i]];
+                    term.txt(x, y, $"{nearby[i]}({d.hp}/{d.hpMax}) {e.reputations[4]}", COLOR.White, COLOR.Black);
+                }
 
             }
         }
