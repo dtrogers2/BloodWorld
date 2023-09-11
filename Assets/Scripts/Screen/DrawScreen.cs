@@ -66,7 +66,7 @@ public class DrawScreen
                                 c = g.c;
                                 fg = g.color;
 
-                                if (ENTITY.has(entity, COMPONENT.CREATURE) && ENTITY.has(entity, COMPONENT.DEFENSES) && entity != game.playerId)
+                                if (ENTITY.has(entity, COMPONENT.CREATURE) && ENTITY.has(entity, COMPONENT.DEFENSES) && ENTITY.has(entity, COMPONENT.EGO) && entity != game.playerId)
                                 {
                                     nearby.Add(entity);
                                 }
@@ -131,18 +131,16 @@ public class DrawScreen
                 Glyph g = (Glyph)ComponentManager.get(COMPONENT.GLYPH).data[nearby[i]];
                 Defenses d = (Defenses)ComponentManager.get(COMPONENT.DEFENSES).data[nearby[i]];
                 Creature c = (Creature)ComponentManager.get(COMPONENT.CREATURE).data[nearby[i]];
+                Ego e = (Ego)ComponentManager.get(COMPONENT.EGO).data[nearby[i]];
+                int moodadj = EgoUtils.MoodAdj(nearby[i]);
+                int dis = e.reputations[4] + moodadj;
+                COLOR disCol = (dis >= 250) ? COLOR.Green : (dis > -250) ? COLOR.White : COLOR.Red;
                 // TODO: change color of name based on status effects
                 COLOR col = (d.hp == d.hpMax) ? COLOR.Green : ((float) d.hp / d.hpMax >= .9f) ? COLOR.GreenDark : ((float) d.hp / d.hpMax >= .7f) ? 
                     COLOR.Yellow : ((float) d.hp / d.hpMax >= .5f) ? COLOR.YellowDark : ((float) d.hp / d.hpMax >= .3f) ? COLOR.Red : ((float) d.hp / d.hpMax >= .1f) ? COLOR.RedDark : COLOR.MagentaDark;
                 term.at(x++, y, g.c, COLOR.White, col);
-                term.txt(++x, y, c.name, COLOR.White, COLOR.Black);
+                term.txt(++x, y, c.name, disCol, COLOR.Black);
                 x += c.name.Length;
-                if (ENTITY.has(nearby[i], COMPONENT.EGO))
-                {
-                    Ego e = (Ego)ComponentManager.get(COMPONENT.EGO).data[nearby[i]];
-                    term.txt(x, y, $"{nearby[i]}({d.hp}/{d.hpMax}) {e.reputations[4]}", COLOR.White, COLOR.Black);
-                }
-
             }
         }
     }

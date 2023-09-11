@@ -1,61 +1,116 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Xml.Serialization;
 using UnityEngine;
 
 public enum ITEM
 {
+    [XmlEnum("ITEM.ERROR")]
     Error,
+    [XmlEnum("ITEM.BACKPACK")]
     Backpack,
+    [XmlEnum("ITEM.CROWBAR")]
     Crowbar,
+    [XmlEnum("ITEM.GARLIC")]
     Garlic,
+    [XmlEnum("ITEM.GRAPPLEHOOK")]
     GrapplingHook,
+    [XmlEnum("ITEM.HAMMER_SMALL")]
     Hammer_Small,
+    [XmlEnum("ITEM.HOLYSYMBOL")]
     HolySymbol,
+    [XmlEnum("ITEM.VIAL")]
     Vial,
+    [XmlEnum("ITEM.SPIKE_IRON")]
     Spike_Iron,
+    [XmlEnum("ITEM.LANTERN")]
     Lantern,
+    [XmlEnum("ITEM.FLASK")]
     Flask,
+    [XmlEnum("ITEM.POLE")]
     Pole,
+    [XmlEnum("ITEM.RATION_IRON")]
     Ration_Iron,
+    [XmlEnum("ITEM.RATION_STANDARD")]
     Ration_Standard,
+    [XmlEnum("ITEM.ROPE")]
     Rope,
+    [XmlEnum("ITEM.SACK_SMALL")]
     Sack_Small,
+    [XmlEnum("ITEM.SACK_LARGE")]
     Sack_Large,
+    [XmlEnum("ITEM.STAKE")]
     Stake,
+    [XmlEnum("ITEM.MALLET")]
     Mallet,
+    [XmlEnum("ITEM.LOCKPICK")]
     Lockpick,
+    [XmlEnum("ITEM.PROBE")]
     Probe,
+    [XmlEnum("ITEM.FLINTSTEEL")]
     FlintSteel,
+    [XmlEnum("ITEM.TORCH")]
     Torch,
+    [XmlEnum("ITEM.WATERSKIN")]
     Waterskin,
+    [XmlEnum("ITEM.BOTTLE")]
     Bottle,
+    [XmlEnum("ITEM.WOLFSBANE")]
     Wolfsbane,
+    [XmlEnum("ITEM.BATTLEAXE")]
     Battleaxe,
+    [XmlEnum("ITEM.CLUB")]
     Club,
+    [XmlEnum("ITEM.CROSSBOW")]
     Crossbow,
+    [XmlEnum("ITEM.DAGGER")]
     Dagger,
+    [XmlEnum("ITEM.HANDAXE")]
     Handaxe,
+    [XmlEnum("ITEM.JAVELIN")]
     Javelin,
+    [XmlEnum("ITEM.LANCE")]
     Lance,
+    [XmlEnum("ITEM.LONGBOW")]
     Longbow,
+    [XmlEnum("ITEM.MACE")]
     Mace,
+    [XmlEnum("ITEM.POLEARM")]
     Polearm,
+    [XmlEnum("ITEM.SHORTBOW")]
     Shortbow,
+    [XmlEnum("ITEM.SHORTSWORD")]
     Shortsword,
+    [XmlEnum("ITEM.DAGGER_SILVER")]
     Dagger_Silver,
+    [XmlEnum("ITEM.SLING")]
     Sling,
-    spear,
+    [XmlEnum("ITEM.SPEAR")]
+    Spear,
+    [XmlEnum("ITEM.STAFF")]
     Staff,
+    [XmlEnum("ITEM.SWORD")]
     Sword,
+    [XmlEnum("ITEM.GREATSWORD")]
     Greatsword,
+    [XmlEnum("ITEM.WARHAMMER")]
     Warhammer,
+    [XmlEnum("ITEM.QUIVER")]
     Quiver,
+    [XmlEnum("ITEM.ARROW")]
     Arrow,
+    [XmlEnum("ITEM.BOLT")]
     Bolt,
+    [XmlEnum("ITEM.ARROW_SILVER")]
     Arrow_Silver,
+    [XmlEnum("ITEM.SLINGSTONE")]
     Slingstone,
+    [XmlEnum("ITEM.LEATHER")]
     Leather,
+    [XmlEnum("ITEM.CHAINMAIL")]
     Chainmail,
+    [XmlEnum("ITEM.PLATEMAIL")]
     Platemail,
+    [XmlEnum("ITEM.SHIELD")]
     Shield
 }

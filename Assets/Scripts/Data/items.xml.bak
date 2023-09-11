@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ArrayOfItementry xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <itementry>
+    <id>ITEM.ERROR</id>
+    <components>
+      <Component xsi:type="Glyph">
+        <c>69</c>
+        <color>COLOR.RED</color>
+      </Component>
+      <Component xsi:type="Item">
+        <name>Error</name>
+      </Component>
+    </components>
+  </itementry>
+    <itementry>
+    <id>ITEM.DAGGER</id>
+    <components>
+      <Component xsi:type="Glyph">
+        <c>41</c>
+        <color>COLOR.GRAY</color>
+      </Component>
+      <Component xsi:type="Item">
+		<item>ITEM.DAGGER</item>
+		<flags>ITEMFLAG.WEAPON</flags>
+		<equipslot>EQUIPSLOT.HAND</equipslot>
+		<name>Dagger</name>
+		<description>A small blade for stabbing</description>
+		<weight>10</weight>
+		<value>3</value>
+      </Component>
+	  <Component xsi:type="Attacks">
+	  <attacks>
+		<Attack>
+			<name>strike</name>
+			<dmgDice>1d4</dmgDice>
+			<atkDly>0.8</atkDly>
+		</Attack>
+	  </attacks>
+      </Component>
+    </components>
+</ArrayOfItementry>

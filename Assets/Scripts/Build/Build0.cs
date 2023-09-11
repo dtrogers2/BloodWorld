@@ -26,6 +26,7 @@ public class Build : IBuild
     {
         Env.init();
         MonData.init();
+        ItemData.init();
     }
     public IAI makeAI()
     {
@@ -35,6 +36,7 @@ public class Build : IBuild
     {
         IRegion map = makeMap(game, game.rng, regionPos);
         addMobsToRegion(game, map);
+        addItemsToRegion(game, map);
         return map;
     }
 
@@ -47,6 +49,45 @@ public class Build : IBuild
     {
         makeMobs(game, map, 1);
 
+    }
+
+    public void addItemsToRegion(IGame game, IRegion map)
+    {
+        makeItems(game, map, 1);
+
+    }
+
+    public void makeItems(IGame game, IRegion map, int rate)
+    {
+        int seed2 = map.regionPos.y;
+        int seed3 = map.regionPos.z;
+        Rng r = new Rng(game.rng.getSeed() + map.regionPos.x + (seed2 * 100) + (seed3 * 1000));
+        for (int y = 0; y < map.dim.y; y++)
+        {
+            for (int x = 0;x < map.dim.x; x++)
+            {
+                Vector3Int posLocal = new Vector3Int(x, y, 0);
+                uint cellFlags = map.getCellFlags(posLocal);
+                if (ENTITY.bitHas(cellFlags, (uint)(CELLFLAG.BLOCKED | CELLFLAG.CREATURE))) { continue; }
+                if (game.rng.pct(rate))
+                {
+                    Vector3Int posWorld = new Vector3Int(x + (map.dim.x * map.regionPos.x), y + (map.dim.y * map.regionPos.y), map.regionPos.z);
+                    int roll = r.rngC(1, ItemData.entries.Length);
+                    itementry entry = ItemData.entries[roll];
+                    Position p = new Position { x = posWorld.x, y = posWorld.y, z = posWorld.z };
+                    uint itemId = EntityManager.create();
+                    object[] components = new object[entry.components.Length];
+                    for (int i = 0; i < components.Length; i++)
+                    {
+                        components[i] = entry.components[i].CloneViaSerialization();
+                    }
+
+                    ENTITY.subscribe(itemId, components);
+                    ENTITY.subscribe(itemId, p);
+                    addNPC(itemId, map);
+                }
+            }
+        }
     }
 
     public void makeMobs(IGame game, IRegion map, int rate)
@@ -82,7 +123,7 @@ public class Build : IBuild
                     {
                         Ego e = (Ego)ComponentManager.get(COMPONENT.EGO).data[creatureId];
                         int moodRoll = r.roll("2d6");
-                        MOOD mood = (moodRoll >= 12) ? MOOD.FRIENDLY : (moodRoll >= 10) ? MOOD.DOCILE : (moodRoll > 6) ? MOOD.NEUTRAL : MOOD.AGGRESSIVE;
+                        MOOD mood = (moodRoll >= 12) ? MOOD.FRIENDLY : (moodRoll >= 10) ? MOOD.DOCILE : (moodRoll > 8) ? MOOD.NEUTRAL : MOOD.AGGRESSIVE;
                         
                         e.mood = mood;
                         // Adjust kinship
@@ -109,15 +150,6 @@ public class Build : IBuild
                 }
             }
         }
-        //Vector3Int pos = new Vector3Int(40 + (map.dim.x * map.regionPos.x), 20 + (map.dim.y * map.regionPos.y), 0);
-        //Creature creature = new Creature(pos, "Ant", new TermChar { c = 'a', background = ColorHex.Black, foreground = ColorHex.Red });
-        //Vector3Int pos2 = new Vector3Int(40 + (map.dim.x * map.regionPos.x), 10 + (map.dim.y * map.regionPos.y), 0);
-        //Creature creature2 = new Creature(pos2, "Bat", new TermChar { c = 'b', background = ColorHex.Black, foreground = ColorHex.Black });
-        //creature2.baseMoveCost = 0.5f;
-
-        //Region must be initialized or trying to add leads to infinite loop
-        //addNPC(creature2, map);
-        //addNPC(creature, map);
     }
 
     public void addNPC(uint c, IRegion map)
@@ -154,7 +186,7 @@ public class Build : IBuild
         Glyph g = new Glyph { c = '@', color = COLOR.White };
         Position p = new Position { x = x, y = y, z = 0 };
         Creature c = new Creature { name = "Player", moveSpeed = 30, AP = 0f, vision = 8, exp = new int[] { 4, 0, 0, 0 } };
-        Defenses d = new Defenses { HD = "1d8", hpMax = 20, hp = 20, AC = 11 };
+        Defenses d = new Defenses { HD = "1d8", hpMax = 20, hp = 20, AC = 11, regenRate = 0.7f };
         Attacks a = new Attacks { baseAtkDly = 1f, atkUsed = 0, attacks = new Attack[1] { new Attack { name = "strike", dmgDice = "1d6", atkDly = 1f } } };
         uint player = EntityManager.create();
         ENTITY.subscribe(player, new object[] { g, p, c, d, a, new Ego { factions = FAC.HUMAN } });

@@ -161,7 +161,7 @@
 		<Attack>
 			<name>bite</name>
 			<dmgDice>1d1</dmgDice>
-			<atkDly>1</atkDly>
+			<atkDly>.5</atkDly>
 		</Attack>
 	  </attacks>
       </Component>

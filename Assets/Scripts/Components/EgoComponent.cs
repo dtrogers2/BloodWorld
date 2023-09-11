@@ -1,7 +1,4 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine.UIElements;
 [Serializable]
 public class Ego : Component
 {
@@ -11,7 +8,7 @@ public class Ego : Component
         0, // LAW
         0, // NEUTRAL
         -200, // CHAOS
-        -250, // HUMAN
+        -200, // HUMAN
         -200, // DWARF
         -200, // ELF
         -200, // HALFLING
@@ -31,6 +28,20 @@ public class Ego : Component
     public short loyalty = 300;
     public short kinship = 300;
     public MOOD mood = MOOD.NEUTRAL;
+}
+
+public static class EgoUtils
+{
+    public static int MoodAdj(uint id)
+    {
+        int moodAdj = 0;
+        if (ENTITY.has(id, COMPONENT.EGO))
+        {
+            Ego e = (Ego)ComponentManager.get(COMPONENT.EGO).data[id];
+            moodAdj = (e.mood == MOOD.FRIENDLY) ? 250 : (e.mood == MOOD.DOCILE) ? 100 : (e.mood == MOOD.NEUTRAL) ? 0 : -250;
+        }
+        return moodAdj;
+    }
 }
 
 public enum MOOD

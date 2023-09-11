@@ -25,15 +25,15 @@ public class HitCmd : CmdBase
             AI aiOther = (AI)ComponentManager.get(COMPONENT.AI).data[tgt];
             if (aiOther.target != 0)
             {
-                if (dmg > aiOther.memory)
+                if (dmg > aiOther.aggro)
                 {
                     aiOther.target = me;
-                    aiOther.memory = dmg;
+                    aiOther.aggro = dmg;
                 }
             } else
             {
                 aiOther.target = me;
-                aiOther.memory = dmg;
+                aiOther.aggro = dmg;
             }
         }
         

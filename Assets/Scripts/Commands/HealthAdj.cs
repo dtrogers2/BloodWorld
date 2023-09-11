@@ -79,7 +79,7 @@ public class HealthAdj
         {
             game.world.removeEntity(id, game);
         }
-        ENTITY.unsubscribeAll(id);
+        ENTITY.unsubscribe(id, COMPONENT.CREATURE);
         dropItems();
 
     }

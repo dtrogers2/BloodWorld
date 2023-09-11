@@ -33,7 +33,7 @@ public class AIBase : IAI
         if (!ENTITY.has(ai.target, COMPONENT.CREATURE)) ai.target = 0;
         if (!ENTITY.has(ai.leader, COMPONENT.CREATURE)) ai.leader = 0;
         // if I have a target, chase that target
-        if (ai.target != 0)
+        if (ai.target != 0 && ai.memory > 0 && ai.aggro > 0)
         {
              return STATE.CHASE;
         }
@@ -47,7 +47,7 @@ public class AIBase : IAI
                 if (aiL.target != 0 && ENTITY.has(aiL.target, COMPONENT.CREATURE))
                 {
                     ai.target = aiL.target;
-                    ai.memory = ai.memoryMax;
+                    ai.memory = 1;
                     return STATE.CHASE;
                 }
             }
@@ -78,10 +78,10 @@ public class AIBase : IAI
                 Ego e2 = (Ego)ComponentManager.get(COMPONENT.EGO).data[nearCreatures[i]];
                 for (int u = 0; u < Enum.GetNames(typeof(FAC)).Length; u++)
                 {
-                    if (e1.factions.HasFlag((FAC)(1 << u)))
+                    if (e2.factions.HasFlag((FAC)(1 << u)))
                     {
                         int index = Array.IndexOf(Enum.GetValues(e2.factions.GetType()), (FAC)(1 << u));
-                        if (e2.reputations[index] + moodAdj < -250 && distance < nearestDistance)
+                        if (e1.reputations[index] + moodAdj < -250 && distance < nearestDistance)
                         {
                             nearestHostile = nearCreatures[i];
                             nearestDistance = distance;
@@ -95,6 +95,7 @@ public class AIBase : IAI
             {
                 ai.target = nearestHostile;
                 ai.memory = ai.memoryMax;
+                ai.aggro = 0;
                 return STATE.CHASE;
             }
         }

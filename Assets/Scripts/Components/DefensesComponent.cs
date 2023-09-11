@@ -8,5 +8,7 @@ public class Defenses : Component
     public int hpMax = 0;
     public int hp = 0;
     public short AC = 0;
+    public float regenRate = .2f;
+    public float regenAmt = 0f;
     public STATUS immunities = STATUS.NONE;
 }

@@ -36,6 +36,7 @@ public class BaseScreen : IScreen
         Vector3Int pos = new Vector3Int(p.x, p.y, p.z);
         Stack<uint> activeCreatures = new Stack<uint>();
         List<uint> nearCreatures = new List<uint>();
+        nearCreatures.Add(game.playerId);
         Stack<IRegion> regions = game.world.getRegions(pos, 1, game);
         while (regions.Count > 0)
         {
@@ -78,27 +79,69 @@ public class BaseScreen : IScreen
                     c.AP -= newCost;
                 }
             }
-            finishTurn(c);
+            finishTurn(me, -playerCost);
         }
 
     }
 
-    public void finishTurn(Creature c)
+    public void finishTurn(uint id, float time)
     {
-
+        if (ENTITY.has(id, COMPONENT.DEFENSES))
+        {
+            // Regen HP
+            Defenses d = (Defenses)ComponentManager.get(COMPONENT.DEFENSES).data[id];
+            d.regenAmt += time * d.regenRate;
+            if (d.regenAmt >= 1)
+            {
+                int amt = Mathf.FloorToInt(d.regenAmt);
+                HealthAdj.heal(id, amt);
+                d.regenAmt -= amt;
+            }
+        }
     }
 
     public void finishPlayerTurn(IStack stack)
     {
 
+        itemsHere();
+
         if (ENTITY.has(game.playerId, COMPONENT.CREATURE))
         {
             Creature c = (Creature)ComponentManager.get(COMPONENT.CREATURE).data[game.playerId];
+            finishTurn(game.playerId, -c.AP);
             StainSystem.update(-c.AP, game);
             c.AP = 0f;
         }
 
         over(stack);
+    }
+
+    public void itemsHere()
+    {
+        if (ENTITY.has(game.playerId, COMPONENT.POSITION) && ENTITY.has(game.playerId, COMPONENT.CELLSTACK))
+        {
+            Msg itemMsg = new Msg();
+            itemMsg.color = COLOR.White;
+            itemMsg.text = $"You see here: a ";
+            CellStack s = (CellStack)ComponentManager.get(COMPONENT.CELLSTACK).data[game.playerId];
+            uint entity = s.entity;
+            bool hasItem = false;
+            while (ENTITY.has(entity, COMPONENT.ITEM))
+            {
+                Item i = (Item)ComponentManager.get(COMPONENT.ITEM).data[entity];
+                itemMsg.text += $"{(hasItem ? ",": "")}{i.name}";
+                hasItem = true;
+                if (ENTITY.has(entity, COMPONENT.CELLSTACK)) {
+                    s = (CellStack)ComponentManager.get(COMPONENT.CELLSTACK).data[entity];
+                    entity = s.entity;
+                } else
+                {
+                    break;
+                }
+            }
+
+            if (hasItem) game.msg(itemMsg);
+        }
     }
     public void handleMsgs(IStack s)
     {

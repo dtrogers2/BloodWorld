@@ -28,7 +28,6 @@
       </Component>
 	  <Component xsi:type="Ego">
 		<factions>FAC.HUMAN</factions>
-		<kinship>-150</kinship>
 	  </Component>
     </components>
   </monsterentry>

@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -136,6 +137,37 @@ public class Region : IRegion
                     setCellEntity(o.entity, pos);
                     ENTITY.unsubscribe(eId, COMPONENT.CELLSTACK);
                 }
+            } else if (ENTITY.has(eId, COMPONENT.CELLSTACK)) // If it is not the cell entity and has a cellstack, reassign parent to point to child and remove
+            {
+                List<uint> stack = new List<uint>();
+                stack.Add(getCellEntity(pos));
+                CellStack cMain = (CellStack)ComponentManager.get(COMPONENT.CELLSTACK).data[getCellEntity(pos)];
+                uint subC = cMain.entity;
+                stack.Add(subC);
+                bool hasStack = true;
+                while (hasStack)
+                {
+                    if (ENTITY.has(subC, COMPONENT.CELLSTACK))
+                    {
+                        CellStack c2 = (CellStack)ComponentManager.get(COMPONENT.CELLSTACK).data[subC];
+                        subC = c2.entity;
+                        stack.Add(subC);
+                    }
+                    else
+                    {
+                        hasStack = false;
+                    }
+                }
+
+                int indexMe = stack.IndexOf(eId);
+                int indexParent = indexMe - 1;
+                int indexChild = indexMe + 1;
+                uint parent = stack.ElementAt(indexParent);
+                uint child = stack.ElementAt(indexChild); 
+                CellStack cParent = (CellStack)ComponentManager.get(COMPONENT.CELLSTACK).data[parent];
+                cParent.entity = child;
+
+                ENTITY.unsubscribe(eId, COMPONENT.CELLSTACK);
             }
 
             if (ENTITY.has(eId,COMPONENT.CREATURE))
