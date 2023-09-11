@@ -37,6 +37,8 @@ public class ParseCommand
             case KeyCode.PageDown: dir.x += 1; dir.y += 1; break;
             case KeyCode.Delete: case KeyCode.Period: case KeyCode.Clear: return this.waitCmd();
             case KeyCode.Q: s = new LogScreen(game, maker); break;
+            case KeyCode.I: s = new InvScreen(game, maker, game.playerId, new bool[0][]); break;
+            case KeyCode.G: return this.getCmd();
             default: return null;
         }
 
@@ -65,5 +67,24 @@ public class ParseCommand
     public ICmd waitCmd()
     {
         return new WaitCmd(player, game);
+    }
+
+    public ICmd getCmd()
+    {
+        if (!ENTITY.has(game.playerId, COMPONENT.POSITION) || !ENTITY.has(game.playerId, COMPONENT.INVENTORY)) return null;
+        Position p = (Position)ComponentManager.get(COMPONENT.POSITION).data[game.playerId];
+        Vector3Int position = new Vector3Int(p.x, p.y, p.z);
+        if (game.world.getCellStack(position, game, out Stack<uint> stack))
+        {
+            Stack<uint> items = new Stack<uint>();
+            for (int i = stack.Count; i > 0; i--)
+            {
+                uint item = stack.Pop();
+                if (ENTITY.has(item, COMPONENT.ITEM)) items.Push(item);
+            }
+            if (items.Count == 0) return null;
+            return new GetCmd(player, items.Pop(), game);
+        }
+        return null;
     }
 }

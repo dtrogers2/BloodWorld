@@ -28,6 +28,7 @@ public class DrawScreen
 
     public static void drawMap(ITerm term, Vector3Int worldPos, IGame game)
     {
+        term.clear();
         Vector2Int t = new Vector2Int();
         Vector3Int w = new Vector3Int(0 ,0, worldPos.z);
         Vector3Int viewPortStart = new Vector3Int(worldPos.x - 16, worldPos.y - 10, worldPos.z);

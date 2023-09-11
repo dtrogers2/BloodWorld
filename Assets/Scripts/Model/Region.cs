@@ -170,7 +170,7 @@ public class Region : IRegion
                 ENTITY.unsubscribe(eId, COMPONENT.CELLSTACK);
             }
 
-            if (ENTITY.has(eId,COMPONENT.CREATURE))
+            if (!ENTITY.has(getCellEntity(pos), COMPONENT.CREATURE))
             {
                 delCellFlags(CELLFLAG.CREATURE, pos);
             }

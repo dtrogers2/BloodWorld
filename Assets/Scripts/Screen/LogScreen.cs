@@ -13,6 +13,7 @@ public class LogScreen : BaseScreen
     }
      override public void draw(ITerm term)
     {
+        term.clear();
         int range = term.dim.y - 1;
         int trueLength = 0;
         //if (msgLog.Length < range) range = msgLog.Length;

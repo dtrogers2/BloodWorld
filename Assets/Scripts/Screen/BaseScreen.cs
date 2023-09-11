@@ -122,7 +122,7 @@ public class BaseScreen : IScreen
         {
             Msg itemMsg = new Msg();
             itemMsg.color = COLOR.White;
-            itemMsg.text = $"You see here: a ";
+            itemMsg.text = $"Here: a ";
             CellStack s = (CellStack)ComponentManager.get(COMPONENT.CELLSTACK).data[game.playerId];
             uint entity = s.entity;
             bool hasItem = false;
@@ -139,7 +139,7 @@ public class BaseScreen : IScreen
                     break;
                 }
             }
-
+            itemMsg.text += ";";
             if (hasItem) game.msg(itemMsg);
         }
     }

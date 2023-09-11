@@ -43,4 +43,6 @@ public enum ITEMFLAG : uint
     IDENTIFIED = 1 << 16, // 65,536
     [XmlEnum("ITEMFLAG.EXPERIENCE")]
     EXPERIENCE = 1 << 17, // 131,072
+    [XmlEnum("ITEMFLAG.ALL")]
+    ALL = uint.MaxValue
 }

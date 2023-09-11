@@ -189,7 +189,7 @@ public class Build : IBuild
         Defenses d = new Defenses { HD = "1d8", hpMax = 20, hp = 20, AC = 11, regenRate = 0.7f };
         Attacks a = new Attacks { baseAtkDly = 1f, atkUsed = 0, attacks = new Attack[1] { new Attack { name = "strike", dmgDice = "1d6", atkDly = 1f } } };
         uint player = EntityManager.create();
-        ENTITY.subscribe(player, new object[] { g, p, c, d, a, new Ego { factions = FAC.HUMAN } });
+        ENTITY.subscribe(player, new object[] { g, p, c, d, a, new Ego { factions = FAC.HUMAN }, new Inventory { allowedItems = ITEMFLAG.ALL } });
         game.playerId = player;
         HealthAdj.initHD(game.playerId, game);
         game.world.addEntity(game.playerId, game);
