@@ -11,9 +11,8 @@ public class OptScreen : GameScreen
     public bool wrapY;
     public int curX = 0;
     public int curY = 0;
-    public OptScreen(IGame game, IScreenMaker m, bool[][] options, bool wrapX = false, bool wrapY = false) : base(game, m)
+    public OptScreen(IGame game, IScreenMaker m, bool wrapX = false, bool wrapY = false) : base(game, m)
     {
-        this.options = options;
         this.wrapX = wrapX;
         this.wrapY = wrapY;
     }

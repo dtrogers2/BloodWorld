@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEditor.Progress;
 
 public class ParseCommand
 {
@@ -37,8 +38,18 @@ public class ParseCommand
             case KeyCode.PageDown: dir.x += 1; dir.y += 1; break;
             case KeyCode.Delete: case KeyCode.Period: case KeyCode.Clear: return this.waitCmd();
             case KeyCode.Q: s = new LogScreen(game, maker); break;
-            case KeyCode.I: s = new InvScreen(game, maker, game.playerId, new bool[0][]); break;
-            case KeyCode.G: return this.getCmd();
+            case KeyCode.I: s = new InvScreen(game, maker, game.playerId); break;
+            case KeyCode.G: {
+                    List<uint> items = ItemSystem.getItemsAt(game.playerId, game);
+                    if (items.Count > 1)
+                    {
+                        s = new GetScreen(game, maker, game.playerId, items);
+                    } else if (items.Count == 1)
+                    {
+                        return this.getCmd(items[0]);
+                    }
+                    break;
+                } 
             default: return null;
         }
 
@@ -69,22 +80,8 @@ public class ParseCommand
         return new WaitCmd(player, game);
     }
 
-    public ICmd getCmd()
+    public ICmd getCmd(uint item)
     {
-        if (!ENTITY.has(game.playerId, COMPONENT.POSITION) || !ENTITY.has(game.playerId, COMPONENT.INVENTORY)) return null;
-        Position p = (Position)ComponentManager.get(COMPONENT.POSITION).data[game.playerId];
-        Vector3Int position = new Vector3Int(p.x, p.y, p.z);
-        if (game.world.getCellStack(position, game, out Stack<uint> stack))
-        {
-            Stack<uint> items = new Stack<uint>();
-            for (int i = stack.Count; i > 0; i--)
-            {
-                uint item = stack.Pop();
-                if (ENTITY.has(item, COMPONENT.ITEM)) items.Push(item);
-            }
-            if (items.Count == 0) return null;
-            return new GetCmd(player, items.Pop(), game);
-        }
-        return null;
+        return new GetCmd(player, item, game);
     }
 }

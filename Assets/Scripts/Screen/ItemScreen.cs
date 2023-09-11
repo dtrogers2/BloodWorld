@@ -10,7 +10,7 @@ public class ItemScreen : OptScreen
     public uint me;
     public uint item;
     public Item it;
-    public ItemScreen(IGame game, IScreenMaker m, uint me, uint item, bool[][] options, bool wrapX = false, bool wrapY = false) : base(game, m, options, wrapX, wrapY)
+    public ItemScreen(IGame game, IScreenMaker m, uint me, uint item, bool wrapX = false, bool wrapY = false) : base(game, m, wrapX, wrapY)
     {
         it = (Item)ComponentManager.get(COMPONENT.ITEM).data[item];
         this.me = me;
@@ -24,9 +24,9 @@ public class ItemScreen : OptScreen
     {
         term.clear();
         term.txt(0, 0, $"{it.name}", COLOR.White, COLOR.Black);
-        int y = 1;
+        int y = 2;
         term.txt(0, ++y, $"{it.description}", COLOR.White, COLOR.Black);
-        y++;
+        y += 2;
         int x = 0;
         string drop = "(d)rop";
         string thr = "(t)hrow";
@@ -51,6 +51,16 @@ public class ItemScreen : OptScreen
             case KeyCode.D:
                 {
                     dropItem(stack);
+                    break;
+                }
+            case KeyCode.Return:
+            case KeyCode.KeypadEnter:
+                {
+                    switch (curX) {
+                        case 0:
+                            dropItem(stack);
+                            break;
+                    }
                     break;
                 }
         }
