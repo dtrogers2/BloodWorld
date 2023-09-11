@@ -32,7 +32,7 @@ public class GetCmd : CmdBase
         game.world.removeEntity(item, game);
         ENTITY.unsubscribe(item, COMPONENT.POSITION);
         cost = 1f;
-        if (me == game.playerId) game.msg(new Msg { text = $"Acquired {it.name}", color = COLOR.Yellow});
+        if (me == game.playerId) game.msg(new Msg { text = $"Acquired {it.name};", color = COLOR.Yellow});
         handleOwnership(it);
         return true;
     }
@@ -48,5 +48,6 @@ public class GetCmd : CmdBase
     public void handleOwnership(Item it)
     {
         if (it.owner == 0) it.owner = me;
+        // If the player is not friendly towards the owner, then the owner is aggroed
     }
 }

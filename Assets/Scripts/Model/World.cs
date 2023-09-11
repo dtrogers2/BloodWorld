@@ -141,6 +141,18 @@ public class World
         return false;
     }
 
+    public void setCellEntity(Vector3Int worldPos, IGame game, uint entity)
+    {
+        Vector2Int stockTerm = Term.StockDim();
+        if (worldPos.x >= 0 && worldPos.x < worldDim.x * stockTerm.x && worldPos.y >= 0 && worldPos.y < worldDim.y * stockTerm.y && worldPos.z >= 0 && worldPos.z < worldDim.z)
+        {
+            if (getRegion(worldPos, game, out IRegion r))
+            {
+                r.setCellEntity(entity, worldPos);
+            }
+        }
+    }
+
     public void add(IRegion region, Vector3Int pos)
     {
         regions[pos.x, pos.y, pos.z] = region;

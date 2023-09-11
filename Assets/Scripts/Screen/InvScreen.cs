@@ -1,14 +1,17 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class InvScreen : OptScreen
 {
     public string name { get; set; } = "invscreen";
+    public uint entity;
     public Inventory inv;
     public InvScreen(IGame game, IScreenMaker m, uint entity, bool[][] options, bool wrapX = false, bool wrapY = false) : base(game, m, options, wrapX, wrapY)
     {
+        this.entity = entity;
         inv = (Inventory)ComponentManager.get(COMPONENT.INVENTORY).data[entity];
         // Reset options to length of inventory
         this.options = new bool[inv.items.Count][];
@@ -36,14 +39,19 @@ public class InvScreen : OptScreen
     {
         base.onKey(keycode, stack);
         int pos = char2pos((char)keycode);
-        if (pos >= 0)
+        if ((pos >= 0 && pos < inv.items.Count) || keycode == KeyCode.Return)
         {
+            if (keycode == KeyCode.Return)
+            {
+                pos = curY;
+            }
             this.itemMenu(pos, stack);
         }
     }
 
     public void itemMenu(int pos, IStack stack)
     {
-
+        stack.pop();
+        stack.push(new ItemScreen(game, maker, entity, inv.items.ElementAt(pos), new bool[0][]));
     }
 }

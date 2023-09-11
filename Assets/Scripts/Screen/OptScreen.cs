@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class OptScreen : BaseScreen
+public class OptScreen : GameScreen
 {
     public string name { get; set; } = "optionscreen";
     public bool[][] options;

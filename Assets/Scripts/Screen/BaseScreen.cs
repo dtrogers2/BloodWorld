@@ -116,6 +116,18 @@ public class BaseScreen : IScreen
         over(stack);
     }
 
+    public void screenpopTakeTurn(IStack stack, float ap)
+    {
+        stack.pop();
+        if (ENTITY.has(game.playerId, COMPONENT.CREATURE))
+        {
+            Creature player = (Creature)ComponentManager.get(COMPONENT.CREATURE).data[game.playerId];
+            player.AP -= ap;
+            game.time += Mathf.Abs(ap);
+            npcTurns(stack);
+        }
+    }
+
     public void itemsHere()
     {
         if (ENTITY.has(game.playerId, COMPONENT.POSITION) && ENTITY.has(game.playerId, COMPONENT.CELLSTACK))

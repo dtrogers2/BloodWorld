@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public static class StainSystem
@@ -81,9 +83,10 @@ public static class StainSystem
 
     public static void update(float time, IGame game)
     {
-        for (int stainCount = ComponentManager.get(COMPONENT.STAIN).entities.Count - 1; stainCount > 0; stainCount--)
+        for (int stainIndex = ComponentManager.get(COMPONENT.STAIN).entities.Count - 1; stainIndex >= 0; stainIndex--)
         {
-            uint stainId = ComponentManager.get(COMPONENT.STAIN).entities[stainCount];
+
+            uint stainId = ComponentManager.get(COMPONENT.STAIN).entities[stainIndex];
             if (!Env.isEnv(stainId))
             {
 
@@ -99,7 +102,6 @@ public static class StainSystem
                     {
                         game.world.removeEntity(stainId, game);
                         ENTITY.unsubscribe(stainId, new COMPONENT[2] { COMPONENT.GLYPH, COMPONENT.POSITION });
-
                     }
                 }
             }
