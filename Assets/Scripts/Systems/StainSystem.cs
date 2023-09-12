@@ -91,6 +91,7 @@ public static class StainSystem
             {
 
                 Stain s = (Stain)ComponentManager.get(COMPONENT.STAIN).data[stainId];
+                Position p = (Position)ComponentManager.get(COMPONENT.POSITION).data[stainId];
                 s.amount -= time;
 
                 if (s.amount <= 0)

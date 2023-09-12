@@ -30,7 +30,11 @@ public class InvScreen : OptScreen
         {
             char c = pos2char(pos);
             Item i = (Item)ComponentManager.get(COMPONENT.ITEM).data[item];
-            term.txt(0, 1 + pos, $"{c} {(options[pos][0] ? "+" : "-")} {i.name}", (i.equipped ? COLOR.GreenDark : COLOR.White), (pos == curY) ? COLOR.GrayDark : COLOR.Black);
+            term.txt(0, 1 + pos, $"{c} {(options[pos][0] ? "+" : "-")} " +
+                $"{(ENTITY.bitHas((uint) i.flags, (uint)ITEMFLAG.STACKABLE) ? $"{i.amt}" : "") } {i.name}" +
+                $"{(i.amt > 1 && ENTITY.bitHas((uint)i.flags, (uint)ITEMFLAG.STACKABLE) ? "s": "")} " +
+                $"{(ENTITY.bitHas((uint)i.flags, (uint)ITEMFLAG.CHARGES) ? $" ({i.amt} charges)" : "")}",
+                (i.equipped ? COLOR.GreenDark : COLOR.White), (pos == curY) ? COLOR.GrayDark : COLOR.Black);
             pos++;
         }
     }

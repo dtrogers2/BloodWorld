@@ -12,4 +12,5 @@ public class Item : Component
     public int weight = 0;
     public int value = 0;
     public uint owner = 0;
+    public uint amt = 1;
 }

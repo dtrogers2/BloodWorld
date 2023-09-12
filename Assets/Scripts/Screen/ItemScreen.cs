@@ -23,7 +23,10 @@ public class ItemScreen : OptScreen
     override public void draw(ITerm term)
     {
         term.clear();
-        term.txt(0, 0, $"{it.name}", (it.equipped ? COLOR.GreenDark : COLOR.White), COLOR.Black);
+        term.txt(0, 0, $"{(ENTITY.bitHas((uint)it.flags, (uint)ITEMFLAG.STACKABLE) ? $"{it.amt}": "")}" +
+            $"{it.name}{(ENTITY.bitHas((uint)it.flags, (uint)ITEMFLAG.STACKABLE)  && it.amt > 1? $"s" : "")}" +
+             $"{(ENTITY.bitHas((uint)it.flags, (uint)ITEMFLAG.CHARGES) ? $" ({it.amt} charges)" : "")}",
+             (it.equipped ? COLOR.GreenDark : COLOR.White), COLOR.Black);
         int y = 2;
         term.txt(0, ++y, $"{it.description}", COLOR.White, COLOR.Black);
         y += 2;

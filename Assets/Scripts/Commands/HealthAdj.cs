@@ -80,9 +80,11 @@ public class HealthAdj
             game.world.removeEntity(id, game);
         }
         ENTITY.unsubscribe(id, COMPONENT.CREATURE);
+        ENTITY.unsubscribe(id, COMPONENT.AI);
+        ENTITY.unsubscribe(id, COMPONENT.EGO);
+        ENTITY.unsubscribe(id, COMPONENT.ATTACKS);
+        ENTITY.unsubscribe(id, COMPONENT.DEFENSES);
         dropItems(id, game);
-        ENTITY.unsubscribeAll(id);
-
     }
 
     public static void dropItems(uint id, IGame game)
@@ -94,5 +96,6 @@ public class HealthAdj
 
             ItemSystem.dropItem(id, inv.items[i], game, out float delay);
         }
+        ENTITY.unsubscribe(id, COMPONENT.INVENTORY);
     }
 }
