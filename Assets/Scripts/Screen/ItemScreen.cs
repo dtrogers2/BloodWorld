@@ -23,21 +23,21 @@ public class ItemScreen : OptScreen
     override public void draw(ITerm term)
     {
         term.clear();
-        term.txt(0, 0, $"{it.name}", COLOR.White, COLOR.Black);
+        term.txt(0, 0, $"{it.name}", (it.equipped ? COLOR.GreenDark : COLOR.White), COLOR.Black);
         int y = 2;
         term.txt(0, ++y, $"{it.description}", COLOR.White, COLOR.Black);
         y += 2;
         int x = 0;
         string drop = "(d)rop";
         string thr = "(t)hrow";
-        string unequip = "(u)nequip";
+        //string unequip = "(u)nequip";
         string wear = "(w)ear";
         term.txt(x, y, drop, COLOR.White, (curX == 0) ? COLOR.GrayDark : COLOR.Black);
         x += drop.Length + 1;
         term.txt(x, y, thr, COLOR.White, (curX == 1) ? COLOR.GrayDark : COLOR.Black);
         x += thr.Length + 1;
-        term.txt(x, y, unequip, COLOR.White, (curX == 2) ? COLOR.GrayDark : COLOR.Black);
-        x += unequip.Length + 1;
+        //term.txt(x, y, unequip, COLOR.White, (curX == 2) ? COLOR.GrayDark : COLOR.Black);
+        //x += unequip.Length + 1;
         term.txt(x, y, wear, COLOR.White, (curX == 3) ? COLOR.GrayDark : COLOR.Black);
         x += wear.Length + 1;
     }
@@ -48,6 +48,11 @@ public class ItemScreen : OptScreen
 
         switch(keycode)
         {
+            case KeyCode.W:
+                {
+                    equipItem(stack);
+                    break;
+                }
             case KeyCode.D:
                 {
                     dropItem(stack);
@@ -69,6 +74,16 @@ public class ItemScreen : OptScreen
     public bool dropItem(IStack stack)
     {
         bool ok = new DropCmd(me, item, game).turn(out float ap);
+        if (ok)
+        {
+            screenpopTakeTurn(stack, ap);
+        }
+        return ok;
+    }
+
+    public bool equipItem(IStack stack)
+    {
+        bool ok = (it.equipped) ? new DoffCmd(me, item, game).turn(out float ap) : new DonCmd(me, item, game).turn(out ap);
         if (ok)
         {
             screenpopTakeTurn(stack, ap);

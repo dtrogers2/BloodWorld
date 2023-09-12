@@ -80,12 +80,19 @@ public class HealthAdj
             game.world.removeEntity(id, game);
         }
         ENTITY.unsubscribe(id, COMPONENT.CREATURE);
-        dropItems();
+        dropItems(id, game);
+        ENTITY.unsubscribeAll(id);
 
     }
 
-    public static void dropItems()
+    public static void dropItems(uint id, IGame game)
     {
+        if (!ENTITY.has(id, COMPONENT.INVENTORY)) return;
+        Inventory inv = (Inventory)ComponentManager.get(COMPONENT.INVENTORY).data[id];
+        for (int i = inv.items.Count - 1; i > 0; i--)
+        {
 
+            ItemSystem.dropItem(id, inv.items[i], game, out float delay);
+        }
     }
 }
