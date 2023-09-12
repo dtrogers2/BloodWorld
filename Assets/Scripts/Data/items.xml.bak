@@ -38,4 +38,32 @@
 	  </attacks>
       </Component>
     </components>
+	</itementry>
+	<itementry>
+    <id>ITEM.GREATSWORD</id>
+    <components>
+      <Component xsi:type="Glyph">
+        <c>41</c>
+        <color>COLOR.GRAY</color>
+      </Component>
+      <Component xsi:type="Item">
+		<item>ITEM.GREATSWORD</item>
+		<flags>ITEMFLAG.WEAPON</flags>
+		<equipslot>EQUIPSLOT.TWOHANDED</equipslot>
+		<name>Greatsword</name>
+		<description>A two handed sword</description>
+		<weight>150</weight>
+		<value>15</value>
+      </Component>
+	  <Component xsi:type="Attacks">
+	  <attacks>
+		<Attack>
+			<name>slashes</name>
+			<dmgDice>1d10</dmgDice>
+			<atkDly>1.2</atkDly>
+		</Attack>
+	  </attacks>
+      </Component>
+    </components>
+	</itementry>
 </ArrayOfItementry>

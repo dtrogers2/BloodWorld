@@ -117,11 +117,11 @@ public static class ItemSystem
                         delay += tmp;
                         continue;
                 } 
-                else if (ENTITY.bitIs((uint) it.equipslot, (uint) EQUIPSLOT.HAND) && ENTITY.bitIs((uint)it2.equipslot, (uint)EQUIPSLOT.HAND)) //If a 1 handed item is equipped
+                else if (ENTITY.bitIs((uint) it.equipslot, (uint) EQUIPSLOT.HAND) && (ENTITY.bitIs((uint)it2.equipslot, (uint)EQUIPSLOT.HAND) || ENTITY.bitHas((uint)it2.equipslot, (uint)EQUIPSLOT.TWOHANDED))) //If a 1 handed item is equipped
                 {
-                    if (handEty > 0)
+                    if (handEty > 0 || ENTITY.bitHas((uint)it2.equipslot, (uint)EQUIPSLOT.TWOHANDED))
                     {
-                        // Unequip the 2nd ring;
+                        // Unequip the 2nd weapon or two handed weapon;
                         if (!doffItem(entity, invItem, game, out float tmp)) return false;
                         delay += tmp;
                         break;
